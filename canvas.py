@@ -23,7 +23,8 @@ class Canvas():
     self.event_box.add_events(
         gdk.EventMask.BUTTON_PRESS_MASK
       | gdk.EventMask.BUTTON_RELEASE_MASK
-      | gdk.EventMask.POINTER_MOTION_MASK)
+      | gdk.EventMask.POINTER_MOTION_MASK
+      | gdk.EventMask.SCROLL_MASK)
     self.event_box.add(self.canvas)
     self.pixel_x = 0
     self.pixel_y = 0
@@ -31,7 +32,7 @@ class Canvas():
     self.offset_y = 0
     self.cursor_x = 0
     self.cursor_y = 0
-    self.pixel_size = 10 # each pixel is 10 times as large
+    self.pixel_size = 10.0 # each pixel is 10 times as large
     self.button_left_down = False
     self.button_middle_down = False
     self.tilemap = {} # looks like: (x, y) -> tile_id
@@ -40,17 +41,19 @@ class Canvas():
     self.tilemap[(2, 0)] = 0
     self.tilemap[(3, 0)] = 0
     self.tilemap[(4, 0)] = 0
+    self.tileset.add()
 
   def update(self):
     if self.button_left_down:
-      for tile_pos, tile_id in self.tilemap.items():
+      tile_x = int(self.pixel_x / self.tileset.get_tile_width())
+      tile_y = int(self.pixel_y / self.tileset.get_tile_height())
+      tile_pos = (tile_x, tile_y)
+      if tile_pos in self.tilemap:
+        tile_id = self.tilemap[tile_pos]
         tile = self.tileset.get(tile_id)
-        tile_x, tile_y = tile_pos
-        if (tile_x == int(self.pixel_x / self.tileset.get_tile_width())
-            and tile_y == int(self.pixel_y / self.tileset.get_tile_height())):
-          tile.set_pixel(self.pixel_x % self.tileset.get_tile_width(),
-              self.pixel_y % self.tileset.get_tile_height(),
-              (1, 0, 0, 1))
+        tile.set_pixel(self.pixel_x % self.tileset.get_tile_width(),
+            self.pixel_y % self.tileset.get_tile_height(),
+            (1, 0, 0, 1))
 
   def release(self, widget, event):
     if event.button == 2:
@@ -63,14 +66,15 @@ class Canvas():
       self.button_middle_down = True
     if event.button == 1:
       self.button_left_down = True
-    self.tileset.add()
     # self.tilemap[(1, 0)] = 0
     # self.tilemap[(0, 1)] = 0
     self.update()
 
   def scroll(self, widget, event):
-    print("SUP")
-    print(dir(event))
+    if event.direction == gdk.ScrollDirection.UP:
+      self.pixel_size *= 1.1
+    else:
+      self.pixel_size /= 1.1
 
   def move(self, widget, event):
     self.pixel_x = int((event.x - self.offset_x) / self.pixel_size)
@@ -85,6 +89,8 @@ class Canvas():
 
   def draw(self, widget, ctx):
     ctx.translate(self.offset_x, self.offset_y)
+    ctx.scale(self.pixel_size, self.pixel_size)
+    ctx.set_antialias(cairo.ANTIALIAS_NONE)
     style = widget.get_style_context()
     width = widget.get_allocated_width()
     height = widget.get_allocated_height()
@@ -94,8 +100,7 @@ class Canvas():
     for tile_pos, tile_id in self.tilemap.items():
       tile = self.tileset.get(tile_id)
       tile.draw(ctx, self.pixel_size, tile_pos)
-    self.toolbar.draw_cursor(ctx, self.pixel_x * self.pixel_size, self.pixel_y * self.pixel_size, self.pixel_size)
-
+    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y, 1)
 
   def widget(self):
     return self.event_box

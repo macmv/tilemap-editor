@@ -51,16 +51,14 @@ class Tile():
 
   def draw(self, ctx, pixel_size, tile_pos):
     tile_x, tile_y = tile_pos
-    tmp_img = self.img.resize((self.width * pixel_size, self.height * pixel_size), resample=Image.BOX)
-    arr = numpy.array(tmp_img)
+    arr = numpy.array(self.img)
     height, width, channels = arr.shape
     surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)
-    # ctx.scale(pixel_size, pixel_size)
-    ctx.set_source_surface(surface, tile_x * self.width * pixel_size, tile_y * self.height * pixel_size)
-    ctx.rectangle(tile_x * self.width * pixel_size,
-        tile_y * self.height * pixel_size,
-        self.width * pixel_size,
-        self.height * pixel_size)
+    ctx.set_source_surface(surface, tile_x * self.width, tile_y * self.height)
+    ctx.rectangle(tile_x * self.width,
+        tile_y * self.height,
+        self.width,
+        self.height)
     ctx.fill()
 
 def create():

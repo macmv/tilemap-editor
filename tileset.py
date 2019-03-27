@@ -6,7 +6,6 @@ from gi.repository import GdkPixbuf as gdkPixbuf
 from gi.repository import GLib as gLib
 import array
 import cairo
-import numpy
 from PIL import Image
 
 # Stores all the tiles created. Can be selected and drawn onto canvas to be edited

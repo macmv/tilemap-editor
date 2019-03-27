@@ -96,10 +96,8 @@ class Canvas():
     widget.queue_draw()
 
   def draw(self, widget, ctx):
-    print(self.offset_x)
     ctx.translate(self.offset_x, self.offset_y)
     ctx.scale(self.pixel_size, self.pixel_size)
-    ctx.set_antialias(cairo.ANTIALIAS_NONE)
     style = widget.get_style_context()
     width = widget.get_allocated_width()
     height = widget.get_allocated_height()

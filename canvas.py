@@ -39,6 +39,7 @@ class Canvas():
     self.tilemap[(0, 0)] = 0
     self.tilemap[(1, 0)] = 0
     self.tilemap[(2, 0)] = 0
+    self.tilemap[(2, 1)] = 0
     self.tilemap[(3, 0)] = 0
     self.tilemap[(4, 0)] = 0
     self.tileset.add()
@@ -69,12 +70,19 @@ class Canvas():
     # self.tilemap[(1, 0)] = 0
     # self.tilemap[(0, 1)] = 0
     self.update()
+    widget.queue_draw()
 
   def scroll(self, widget, event):
     if event.direction == gdk.ScrollDirection.UP:
-      self.pixel_size *= 1.1
+      self.pixel_size += self.pixel_size * 0.1
+      self.offset_x -= (0.1 * (self.cursor_x - self.offset_x))
+      self.offset_y -= (0.1 * (self.cursor_y - self.offset_y))
     else:
-      self.pixel_size /= 1.1
+      self.pixel_size -= self.pixel_size * 0.1
+      self.offset_x += (0.1 * (self.cursor_x - self.offset_x))
+      self.offset_y += (0.1 * (self.cursor_y - self.offset_y))
+    self.update()
+    widget.queue_draw()
 
   def move(self, widget, event):
     self.pixel_x = int((event.x - self.offset_x) / self.pixel_size)
@@ -88,13 +96,13 @@ class Canvas():
     widget.queue_draw()
 
   def draw(self, widget, ctx):
+    print(self.offset_x)
     ctx.translate(self.offset_x, self.offset_y)
     ctx.scale(self.pixel_size, self.pixel_size)
     ctx.set_antialias(cairo.ANTIALIAS_NONE)
     style = widget.get_style_context()
     width = widget.get_allocated_width()
     height = widget.get_allocated_height()
-
     gtk.render_background(style, ctx, 0, 0, width, height)
 
     for tile_pos, tile_id in self.tilemap.items():

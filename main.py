@@ -23,7 +23,7 @@ class MyWindow(gtk.Window):
 
     menu_bar = menu_bar_module.create()
     tileset = tileset_module.create()
-    tool_settings = tool_settings_module.create()
+    tool_settings = tool_settings_module.create(self)
     toolbar = toolbar_module.create(tileset, tool_settings)
     canvas = canvas_module.create(toolbar)
 

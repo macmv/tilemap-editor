@@ -10,7 +10,7 @@ class Canvas():
     self.toolbar = toolbar
     self.tileset = self.toolbar.get_tileset()
     self.canvas = gtk.DrawingArea()
-    self.canvas.set_size_request(1536, 864) # 0.8 * 1080p
+    self.canvas.set_size_request(960, 540) # 0.5 * 1080p
     self.canvas.set_hexpand(True)
     self.canvas.set_vexpand(True)
     self.canvas.connect("draw", self.draw)

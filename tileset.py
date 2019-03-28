@@ -53,7 +53,7 @@ class Tile():
     return self.height
 
   def set_pixel(self, x, y, color):
-    self.pixels[x, y] = tuple([x * 255 for x in color])
+    self.pixels[x, y] = (int(color.red / 256), int(color.green / 256), int(color.blue / 256))
     self.update_pattern()
 
   def draw(self, ctx, pixel_size, tile_pos):

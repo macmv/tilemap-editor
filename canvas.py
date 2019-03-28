@@ -27,8 +27,8 @@ class Canvas():
     self.event_box.add(self.canvas)
     self.pixel_x = 0
     self.pixel_y = 0
-    self.offset_x = 0
-    self.offset_y = 0
+    self.offset_x = 0.0
+    self.offset_y = 0.0
     self.cursor_x = 0
     self.cursor_y = 0
     self.pixel_size = 10.0 # each pixel is 10 times as large
@@ -50,8 +50,8 @@ class Canvas():
     if tile_pos in self.tilemap:
         tile_id = self.tilemap[tile_pos]
         tile = self.tileset.get(tile_id)
-        tile.set_pixel(self.pixel_x % self.tileset.get_tile_width(),
-            self.pixel_y % self.tileset.get_tile_height(),
+        tile.set_pixel(pixel_x % self.tileset.get_tile_width(),
+            pixel_y % self.tileset.get_tile_height(),
             color)
 
   def update(self):
@@ -75,14 +75,15 @@ class Canvas():
     widget.queue_draw()
 
   def scroll(self, widget, event):
+    zoom_amount = 0.1
     if event.direction == gdk.ScrollDirection.UP:
-      self.pixel_size += self.pixel_size * 0.1
-      self.offset_x -= (0.1 * (self.cursor_x - self.offset_x))
-      self.offset_y -= (0.1 * (self.cursor_y - self.offset_y))
+      self.pixel_size += self.pixel_size * zoom_amount
+      self.offset_x -= (zoom_amount * (self.cursor_x - self.offset_x))
+      self.offset_y -= (zoom_amount * (self.cursor_y - self.offset_y))
     else:
-      self.pixel_size -= self.pixel_size * 0.1
-      self.offset_x += (0.1 * (self.cursor_x - self.offset_x))
-      self.offset_y += (0.1 * (self.cursor_y - self.offset_y))
+      self.pixel_size -= self.pixel_size * zoom_amount
+      self.offset_x += (zoom_amount * (self.cursor_x - self.offset_x))
+      self.offset_y += (zoom_amount * (self.cursor_y - self.offset_y))
     self.update()
     widget.queue_draw()
 
@@ -109,7 +110,7 @@ class Canvas():
     for tile_pos, tile_id in self.tilemap.items():
       tile = self.tileset.get(tile_id)
       tile.draw(ctx, self.pixel_size, tile_pos)
-    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y, 1)
+    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
 
   def widget(self):
     return self.event_box

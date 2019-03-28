@@ -58,15 +58,14 @@ class Tile():
 
   def draw(self, ctx, pixel_size, tile_pos):
     tile_x, tile_y = tile_pos
+    ctx.save()
     ctx.translate(tile_x * self.width,
         tile_y * self.height)
     ctx.set_source(self.pattern)
-    ctx.rectangle(0,0,
-        self.width,
-        self.height)
+    # ctx.paint()
+    ctx.rectangle(0, 0, self.width, self.height)
     ctx.fill()
-    ctx.translate(-tile_x * self.width,
-        -tile_y * self.height)
+    ctx.restore()
 
 def create():
   return Tileset(16, 16)

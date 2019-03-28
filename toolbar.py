@@ -19,8 +19,8 @@ class Toolbar():
   def click(self, widget):
     pass
 
-  def draw_cursor(self, ctx, cursor_x, cursor_y, size):
-    self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, size)
+  def draw_cursor(self, ctx, cursor_x, cursor_y):
+    self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size())
 
   def widget(self):
     return gtk.Button(label="Click Here")
@@ -44,11 +44,13 @@ class Brush(Tool):
     self.color = (1, 0, 0, 1) # rgba
 
   def use(self, canvas, pixel_x, pixel_y, settings):
-    canvas.set_pixel(pixel_x, pixel_y, settings.get_color())
+    for x in range(int(pixel_x - settings.get_size() / 2 + 0.5), int(pixel_x + settings.get_size() / 2 + 0.5)):
+      for y in range(int(pixel_y - settings.get_size() / 2 + 0.5), int(pixel_y + settings.get_size() / 2 + 0.5)):
+        canvas.set_pixel(x, y, settings.get_color())
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, size):
-    ctx.set_source_rgba(1, 0, 0, 1)
-    ctx.rectangle(cursor_x, cursor_y, size, size)
+    ctx.set_source_rgba(0.8, 0.8, 0.8, 1)
+    ctx.rectangle(int(cursor_x - size / 2 + 0.5), int(cursor_y - size / 2 + 0.5), size, size)
     ctx.fill()
 
 class Eraser(Tool):

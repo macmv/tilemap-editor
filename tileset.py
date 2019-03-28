@@ -52,20 +52,22 @@ class Tile():
   def get_height(self):
     return self.height
 
+  def get_pixel(self, x, y):
+    r, g, b, a = self.pixels[x, y]
+    return gdk.Color(r * 256, g * 256, b * 256)
+
   def set_pixel(self, x, y, color):
     self.pixels[x, y] = (int(color.red / 256), int(color.green / 256), int(color.blue / 256))
     self.update_pattern()
 
   def draw(self, ctx, pixel_size, tile_pos):
     tile_x, tile_y = tile_pos
-    ctx.save()
-    ctx.translate(tile_x * self.width,
-        tile_y * self.height)
+    mat = cairo.Matrix() # apparently this needs to be negative ¯\_(ツ)_/¯
+    mat.translate(-tile_x * self.width, -tile_y * self.height)
+    self.pattern.set_matrix(mat)
     ctx.set_source(self.pattern)
-    # ctx.paint()
-    ctx.rectangle(0, 0, self.width, self.height)
+    ctx.rectangle(tile_x * self.width, tile_y * self.height, self.width, self.height)
     ctx.fill()
-    ctx.restore()
 
 def create():
   return Tileset(16, 16)

@@ -6,7 +6,7 @@ import cairo
 
 # Stores all the tiles arranged in a grid. Also renders everything
 class Canvas():
-  def __init__(self, toolbar): # Toolbar instance. Will contain selected tool from left side
+  def __init__(self, window, toolbar): # Toolbar instance. Will contain selected tool from left side
     self.toolbar = toolbar
     self.tileset = self.toolbar.get_tileset()
     self.canvas = gtk.DrawingArea()
@@ -15,6 +15,8 @@ class Canvas():
     self.canvas.set_vexpand(True)
     self.canvas.connect("draw", self.draw)
     self.event_box = gtk.EventBox()
+    window.connect("key-press-event", self.key_press)
+    window.connect("key-release-event", self.key_release)
     self.event_box.connect("button-press-event", self.click)
     self.event_box.connect("button-release-event", self.release)
     self.event_box.connect("motion-notify-event", self.move)
@@ -43,20 +45,54 @@ class Canvas():
     self.tilemap[(4, 0)] = 0
     self.tileset.add()
 
+  def update(self):
+    if self.button_left_down:
+      self.toolbar.use(self, self.pixel_x, self.pixel_y)
+
+  def draw(self, widget, ctx):
+    ctx.translate(self.offset_x, self.offset_y)
+    ctx.scale(self.pixel_size, self.pixel_size)
+    ctx.set_antialias(cairo.ANTIALIAS_NONE)
+    style = widget.get_style_context()
+    width = widget.get_allocated_width()
+    height = widget.get_allocated_height()
+    gtk.render_background(style, ctx, 0, 0, width, height)
+
+    for tile_pos, tile_id in self.tilemap.items():
+      tile = self.tileset.get(tile_id)
+      tile.draw(ctx, self.pixel_size, tile_pos)
+    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
+
+  def key_press(self, widget, event):
+    self.toolbar.key_press(widget, event)
+    self.update()
+    widget.queue_draw()
+
+  def key_release(self, widget, event):
+    self.toolbar.key_release(widget, event)
+    self.update()
+    widget.queue_draw()
+
+  def get_pixel(self, pixel_x, pixel_y):
+    tile_x = int(pixel_x / self.tileset.get_tile_width())
+    tile_y = int(pixel_y / self.tileset.get_tile_height())
+    tile_pos = (tile_x, tile_y)
+    if tile_pos in self.tilemap:
+      tile_id = self.tilemap[tile_pos]
+      tile = self.tileset.get(tile_id)
+      return tile.get_pixel(pixel_x % self.tileset.get_tile_width(),
+          pixel_y % self.tileset.get_tile_height())
+
   def set_pixel(self, pixel_x, pixel_y, color):
     tile_x = int(pixel_x / self.tileset.get_tile_width())
     tile_y = int(pixel_y / self.tileset.get_tile_height())
     tile_pos = (tile_x, tile_y)
     if tile_pos in self.tilemap:
-        tile_id = self.tilemap[tile_pos]
-        tile = self.tileset.get(tile_id)
-        tile.set_pixel(pixel_x % self.tileset.get_tile_width(),
-            pixel_y % self.tileset.get_tile_height(),
-            color)
-
-  def update(self):
-    if self.button_left_down:
-      self.toolbar.use(self, self.pixel_x, self.pixel_y)
+      tile_id = self.tilemap[tile_pos]
+      tile = self.tileset.get(tile_id)
+      tile.set_pixel(pixel_x % self.tileset.get_tile_width(),
+          pixel_y % self.tileset.get_tile_height(),
+          color)
 
   def release(self, widget, event):
     if event.button == 2:
@@ -69,8 +105,6 @@ class Canvas():
       self.button_middle_down = True
     if event.button == 1:
       self.button_left_down = True
-    # self.tilemap[(1, 0)] = 0
-    # self.tilemap[(0, 1)] = 0
     self.update()
     widget.queue_draw()
 
@@ -98,20 +132,6 @@ class Canvas():
     self.update()
     widget.queue_draw()
 
-  def draw(self, widget, ctx):
-    ctx.translate(self.offset_x, self.offset_y)
-    ctx.scale(self.pixel_size, self.pixel_size)
-    ctx.set_antialias(cairo.ANTIALIAS_NONE)
-    style = widget.get_style_context()
-    width = widget.get_allocated_width()
-    height = widget.get_allocated_height()
-    gtk.render_background(style, ctx, 0, 0, width, height)
-
-    for tile_pos, tile_id in self.tilemap.items():
-      tile = self.tileset.get(tile_id)
-      tile.draw(ctx, self.pixel_size, tile_pos)
-    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
-
   def widget(self):
     return self.event_box
 
@@ -121,5 +141,5 @@ class Canvas():
   def save(self, filename):
     pass
 
-def create(toolbar):
-  return Canvas(toolbar)
+def create(window, toolbar):
+  return Canvas(window, toolbar)

@@ -1,89 +1,66 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
 
-class ListBoxRowWithData(Gtk.ListBoxRow):
-    def __init__(self, data):
-        super(Gtk.ListBoxRow, self).__init__()
-        self.data = data
-        self.add(Gtk.Label(data))
+class MyWindow(Gtk.Window):
 
-class ListBoxWindow(Gtk.Window):
+    key = Gdk.KEY_h
 
     def __init__(self):
-        Gtk.Window.__init__(self, title="ListBox Demo")
-        self.set_border_width(10)
+        # init the base class (Gtk.Window)
+        super().__init__()
 
-        box_outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        self.add(box_outer)
+        # state affected by shortcuts
+        self.shortcut_hits = 0
 
-        listbox = Gtk.ListBox()
-        listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        box_outer.pack_start(listbox, True, True, 0)
+        # Tell Gtk what to do when the window is closed (in this case quit the main loop)
+        self.connect("delete-event", Gtk.main_quit)
 
-        row = Gtk.ListBoxRow()
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
-        row.add(hbox)
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        hbox.pack_start(vbox, True, True, 0)
+        # connect the key-press event - this will call the keypress
+        # handler when any key is pressed
+        self.connect("key-press-event",self.on_key_press_event)
 
-        label1 = Gtk.Label("Automatic Date & Time", xalign=0)
-        label2 = Gtk.Label("Requires internet access", xalign=0)
-        vbox.pack_start(label1, True, True, 0)
-        vbox.pack_start(label2, True, True, 0)
+        # Window content goes in a vertical box
+        box = Gtk.VBox()
 
-        switch = Gtk.Switch()
-        switch.props.valign = Gtk.Align.CENTER
-        hbox.pack_start(switch, False, True, 0)
+        # mapping between Gdk.KEY_h and a string
+        keyname = Gdk.keyval_name(self.key)
 
-        listbox.add(row)
+        # a helpful label
+        instruct = Gtk.Label(label="Press Ctrl+%s" % keyname)
+        box.add(instruct)
 
-        row = Gtk.ListBoxRow()
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
-        row.add(hbox)
-        label = Gtk.Label("Enable Automatic Update", xalign=0)
-        check = Gtk.CheckButton()
-        hbox.pack_start(label, True, True, 0)
-        hbox.pack_start(check, False, True, 0)
+        # the label that will respond to the event
+        self.label = Gtk.Label(label="")
+        self.update_label_text()
 
-        listbox.add(row)
+        # Add the label to the window
+        box.add(self.label)
 
-        row = Gtk.ListBoxRow()
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
-        row.add(hbox)
-        label = Gtk.Label("Date Format", xalign=0)
-        combo = Gtk.ComboBoxText()
-        combo.insert(0, "0", "24-hour")
-        combo.insert(1, "1", "AM/PM")
-        hbox.pack_start(label, True, True, 0)
-        hbox.pack_start(combo, False, True, 0)
+        self.add(box)
 
-        listbox.add(row)
+    def on_key_press_event(self, widget, event):
 
-        listbox_2 = Gtk.ListBox()
-        items = 'This is a sorted ListBox Fail'.split()
+        print("Key press on widget: ", widget)
+        print("          Modifiers: ", event.state)
+        print("      Key val, name: ", event.keyval, Gdk.keyval_name(event.keyval))
 
-        for item in items:
-            listbox_2.add(ListBoxRowWithData(item))
+        # check the event modifiers (can also use SHIFTMASK, etc)
+        ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK)
 
-        def sort_func(row_1, row_2, data, notify_destroy):
-            return row_1.data.lower() > row_2.data.lower()
+        # see if we recognise a keypress
+        if ctrl and event.keyval == Gdk.KEY_h:
+            self.shortcut_hits += 1
+            self.update_label_text()
 
-        def filter_func(row, data, notify_destroy):
-            return False if row.data == 'Fail' else True
+    def update_label_text(self):
+        # Update the label based on the state of the hit variable
+        self.label.set_text("Shortcut pressed %d times" % self.shortcut_hits)
 
-        listbox_2.set_sort_func(sort_func, None, False)
-        listbox_2.set_filter_func(filter_func, None, False)
+if __name__ == "__main__":
+    win = MyWindow()
+    win.show_all()
 
-        def on_row_activated(listbox_widget, row):
-            print(row.data)
-
-        listbox_2.connect('row-activated', on_row_activated)
-
-        box_outer.pack_start(listbox_2, True, True, 0)
-        listbox_2.show_all()
-
-win = ListBoxWindow()
-win.connect("destroy", Gtk.main_quit)
-win.show_all()
-Gtk.main()
+    # Start the Gtk main loop
+    Gtk.main()

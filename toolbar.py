@@ -10,6 +10,9 @@ class Toolbar():
     self.tools = []
     self.tools.append(Brush())
 
+  def use(self, canvas, x, y):
+    self.tools[self.current_tool].use(canvas, x, y, self.tool_settings)
+
   def get_tileset(self):
     return self.tileset
 
@@ -17,7 +20,7 @@ class Toolbar():
     pass
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, size):
-    self.tools[self.current_tool].draw(ctx, cursor_x, cursor_y, size)
+    self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, size)
 
   def widget(self):
     return gtk.Button(label="Click Here")
@@ -29,10 +32,10 @@ class Tool():
   def __init__(self):
     pass
 
-  def use(self, canvas, pixel_x, pixel_y):
+  def use(self, canvas, pixel_x, pixel_y, settings):
     pass
 
-  def draw(self, ctx, cursor_x, cursor_y, size):
+  def draw_cursor(self, ctx, cursor_x, cursor_y, size):
     pass
 
 class Brush(Tool):
@@ -40,11 +43,23 @@ class Brush(Tool):
     self.radius = 1
     self.color = (1, 0, 0, 1) # rgba
 
-  def use(self, canvas, pixel_x, pixel_y):
-    tile_pos = canvas.get_tileset().pixel_to_tile((pixel_x, pixel_y))
-    tile = canvas.get_tile(tile_pos)
+  def use(self, canvas, pixel_x, pixel_y, settings):
+    canvas.set_pixel(pixel_x, pixel_y, settings.get_color())
 
-  def draw(self, ctx, cursor_x, cursor_y, size):
+  def draw_cursor(self, ctx, cursor_x, cursor_y, size):
     ctx.set_source_rgba(1, 0, 0, 1)
+    ctx.rectangle(cursor_x, cursor_y, size, size)
+    ctx.fill()
+
+class Eraser(Tool):
+  def __init__(self):
+    self.radius = 1
+    self.color = (1, 0, 0, 1) # rgba
+
+  def use(self, canvas, pixel_x, pixel_y, settings):
+    canvas.set_pixel(pixel_x, pixel_y, (0, 0, 0, 0))
+
+  def draw_cursor(self, ctx, cursor_x, cursor_y, size):
+    ctx.set_source_rgba(0.9, 0.9, .9, 1)
     ctx.rectangle(cursor_x, cursor_y, size, size)
     ctx.fill()

@@ -38,6 +38,13 @@ class Tile():
     self.img = Image.new('RGB', (width, height), 'black')
     self.img.putalpha(256)
     self.pixels = self.img.load()
+    self.update_pattern()
+
+  def update_pattern(self):
+    arr = bytearray(self.img.tobytes('raw', 'BGRa'))
+    surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, self.img.width, self.img.height)
+    self.pattern = cairo.SurfacePattern(surface)
+    self.pattern.set_filter(cairo.FILTER_NEAREST)
 
   def get_width(self):
     return self.width
@@ -47,16 +54,13 @@ class Tile():
 
   def set_pixel(self, x, y, color):
     self.pixels[x, y] = tuple([x * 255 for x in color])
+    self.update_pattern()
 
   def draw(self, ctx, pixel_size, tile_pos):
     tile_x, tile_y = tile_pos
-    arr = bytearray(self.img.tobytes('raw', 'BGRa'))
-    surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, self.img.width, self.img.height)
-    pattern = cairo.SurfacePattern(surface)
-    pattern.set_filter(cairo.FILTER_NEAREST)
     ctx.translate(tile_x * self.width,
         tile_y * self.height)
-    ctx.set_source(pattern)
+    ctx.set_source(self.pattern)
     ctx.rectangle(0,0,
         self.width,
         self.height)

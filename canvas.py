@@ -13,7 +13,6 @@ class Canvas():
     self.canvas.set_size_request(1536, 864) # 0.8 * 1080p
     self.canvas.set_hexpand(True)
     self.canvas.set_vexpand(True)
-    # self.canvas.set_redraw(True)
     self.canvas.connect("draw", self.draw)
     self.event_box = gtk.EventBox()
     self.event_box.connect("button-press-event", self.click)
@@ -44,17 +43,20 @@ class Canvas():
     self.tilemap[(4, 0)] = 0
     self.tileset.add()
 
-  def update(self):
-    if self.button_left_down:
-      tile_x = int(self.pixel_x / self.tileset.get_tile_width())
-      tile_y = int(self.pixel_y / self.tileset.get_tile_height())
-      tile_pos = (tile_x, tile_y)
-      if tile_pos in self.tilemap:
+  def set_pixel(self, pixel_x, pixel_y, color):
+    tile_x = int(pixel_x / self.tileset.get_tile_width())
+    tile_y = int(pixel_y / self.tileset.get_tile_height())
+    tile_pos = (tile_x, tile_y)
+    if tile_pos in self.tilemap:
         tile_id = self.tilemap[tile_pos]
         tile = self.tileset.get(tile_id)
         tile.set_pixel(self.pixel_x % self.tileset.get_tile_width(),
             self.pixel_y % self.tileset.get_tile_height(),
-            (1, 0, 0, 1))
+            color)
+
+  def update(self):
+    if self.button_left_down:
+      self.toolbar.use(self, self.pixel_x, self.pixel_y)
 
   def release(self, widget, event):
     if event.button == 2:
@@ -98,6 +100,7 @@ class Canvas():
   def draw(self, widget, ctx):
     ctx.translate(self.offset_x, self.offset_y)
     ctx.scale(self.pixel_size, self.pixel_size)
+    ctx.set_antialias(cairo.ANTIALIAS_NONE)
     style = widget.get_style_context()
     width = widget.get_allocated_width()
     height = widget.get_allocated_height()

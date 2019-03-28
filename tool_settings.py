@@ -14,6 +14,9 @@ class ToolSettings():
     self.grid.attach(self.size_slider, 0, 0, 5, 1)
     self.grid.attach(self.color_button, 0, 1, 1, 1)
 
+  def set_size(self, value):
+    self.size_slider.set_value(value)
+
   def set_color(self, color):
     self.color_button.set_color(color)
 

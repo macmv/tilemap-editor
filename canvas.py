@@ -44,6 +44,7 @@ class Canvas():
     self.tilemap[(3, 0)] = 0
     self.tilemap[(4, 0)] = 0
     self.tileset.add()
+    self.keys_down = set()
 
   def update(self):
     if self.button_left_down:
@@ -64,11 +65,13 @@ class Canvas():
     self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
 
   def key_press(self, widget, event):
+    self.keys_down.add(event.keyval)
     self.toolbar.key_press(widget, event)
     self.update()
     widget.queue_draw()
 
   def key_release(self, widget, event):
+    self.keys_down.remove(event.keyval)
     self.toolbar.key_release(widget, event)
     self.update()
     widget.queue_draw()
@@ -109,15 +112,21 @@ class Canvas():
     widget.queue_draw()
 
   def scroll(self, widget, event):
-    zoom_amount = 0.1
-    if event.direction == gdk.ScrollDirection.UP:
-      self.pixel_size += self.pixel_size * zoom_amount
-      self.offset_x -= (zoom_amount * (self.cursor_x - self.offset_x))
-      self.offset_y -= (zoom_amount * (self.cursor_y - self.offset_y))
+    if 65507 in self.keys_down:
+      if event.direction == gdk.ScrollDirection.UP:
+        self.toolbar.tool_settings.set_size(self.toolbar.tool_settings.get_size() + 1)
+      else:
+        self.toolbar.tool_settings.set_size(self.toolbar.tool_settings.get_size() - 1)
     else:
-      self.pixel_size -= self.pixel_size * zoom_amount
-      self.offset_x += (zoom_amount * (self.cursor_x - self.offset_x))
-      self.offset_y += (zoom_amount * (self.cursor_y - self.offset_y))
+      zoom_amount = 0.1
+      if event.direction == gdk.ScrollDirection.UP:
+        self.pixel_size += self.pixel_size * zoom_amount
+        self.offset_x -= (zoom_amount * (self.cursor_x - self.offset_x))
+        self.offset_y -= (zoom_amount * (self.cursor_y - self.offset_y))
+      else:
+        self.pixel_size -= self.pixel_size * zoom_amount
+        self.offset_x += (zoom_amount * (self.cursor_x - self.offset_x))
+        self.offset_y += (zoom_amount * (self.cursor_y - self.offset_y))
     self.update()
     widget.queue_draw()
 

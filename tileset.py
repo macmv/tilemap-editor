@@ -13,7 +13,7 @@ class Tileset():
   def __init__(self, tile_width, tile_height):
     self.tile_width = tile_width
     self.tile_height = tile_height
-    self.tiles = []
+    self.tiles = [] # array of Tile objects
 
   def get_tile_width(self):
     return self.tile_width

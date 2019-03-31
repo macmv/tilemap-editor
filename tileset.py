@@ -15,6 +15,16 @@ class Tileset():
     self.tile_height = tile_height
     self.tiles = [] # array of Tile objects
 
+  def load_tileset(self, width, height, tileset):
+    self.tile_width = width
+    self.tile_height = height
+    self.tiles = []
+    index = 0
+    for tile_img in tileset:
+      self.tiles.append(Tile(width, height))
+      self.tiles[index].load_image(tile_img)
+      index += 1
+
   def get_tile_width(self):
     return self.tile_width
 
@@ -39,6 +49,13 @@ class Tile():
     self.img.putalpha(256)
     self.pixels = self.img.load()
     self.update_pattern()
+
+  def load_image(self, img):
+    if img.width != self.width or img.height != self.height:
+      raise "WTF NOT GOOD IMG"
+    self.img = img
+    self.update_pattern()
+
 
   def update_pattern(self):
     arr = bytearray(self.img.tobytes('raw', 'BGRa'))

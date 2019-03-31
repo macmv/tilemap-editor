@@ -48,10 +48,28 @@ class FileManager:
     proto.height = self.canvas.height
     return proto
 
-  def load(self, filename):
-    # do crap
-    pass
+  def open(self, filename):
+    proto = tilemap_pb2.Tilemap()
+    with open(filename + ".map", "rb") as f:
+      proto.ParseFromString(f.read())
+      print(proto)
+    tileset_arr = self.load_tileset(proto.tileWidth,
+        proto.tileHeight,
+        filename)
+    self.canvas.load_tileset(proto.tileWidth, proto.tileHeight, tileset_arr)
+    self.canvas.load_tilemap(proto)
 
-  def load_tileset(self, filename):
-    # load the image and do crap
-    pass
+  def load_tileset(self, tileWidth, tileHeight, filename): # creates an array of images
+    tileset_image = Image.open(filename + ".png")
+    tileset_arr = []
+    img_width, img_height = tileset_image.size
+    tileset_width = int(img_width / tileWidth)
+    tileset_height = int(img_height / tileHeight)
+    for y in range(tileset_height):
+      for x in range(tileset_width):
+        tile_img = tileset_image.crop((x * tileWidth,
+            y * tileHeight,
+            x * tileWidth + tileWidth,
+            y * tileHeight + tileHeight))
+        tileset_arr.append(tile_img)
+    return tileset_arr

@@ -48,6 +48,18 @@ class Canvas():
     self.tileset.add()
     self.keys_down = set()
 
+  def load_tileset(self, tile_width, tile_height, tileset):
+    self.tileset.load_tileset(tile_width, tile_height, tileset)
+    # self.canvas.queue_draw()
+
+  def load_tilemap(self, proto):
+    self.width = proto.width
+    self.height = proto.height
+    self.tilemap = {}
+    for index in proto.tiles:
+      self.tilemap[(index % self.width, int(index / self.width))] = proto.tiles[index]
+    self.canvas.queue_draw()
+
   def update(self):
     if self.button_left_down:
       self.toolbar.use(self, self.pixel_x, self.pixel_y)

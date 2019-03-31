@@ -123,3 +123,21 @@ class Eraser(Tool):
     ctx.set_source_rgba(1, 1, 1, 1)
     ctx.rectangle(cursor_x, cursor_y, size, size)
     ctx.fill()
+
+class TilePlacer(Tool):
+  def __init__(self, index):
+    self.index = index
+    self.button_path = "./assets/pencil.png"
+    self.radius = 1
+    self.color = (1, 0, 0, 1) # rgba
+
+  def use(self, canvas, pixel_x, pixel_y, settings):
+    selected_index = canvas.get_tileset().get_selected_tile()
+    canvas.place_tile(int(pixel_x / canvas.get_tileset().get_tile_width()),
+        int(pixel_y / canvas.get_tileset().get_tile_height()),
+        selected_index)
+
+  def draw_cursor(self, ctx, cursor_x, cursor_y, size):
+    ctx.set_source_rgba(1, 1, 1, 1)
+    ctx.rectangle(cursor_x, cursor_y, size, size)
+    ctx.fill()

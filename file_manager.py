@@ -56,8 +56,7 @@ class FileManager:
     tileset_arr = self.load_tileset(proto.tileWidth,
         proto.tileHeight,
         filename)
-    self.canvas.load_tileset(proto.tileWidth, proto.tileHeight, tileset_arr)
-    self.canvas.load_tilemap(proto)
+    return tileset_arr, proto
 
   def load_tileset(self, tileWidth, tileHeight, filename): # creates an array of images
     tileset_image = Image.open(filename + ".png")

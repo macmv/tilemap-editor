@@ -3,10 +3,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 import cairo
+import file_manager
 
 # Stores all the tiles arranged in a grid. Also renders everything
 class Canvas():
-  def __init__(self, window, toolbar): # Toolbar instance. Will contain selected tool from left side
+  def __init__(self, filename, window, toolbar): # Toolbar instance. Will contain selected tool from left side
     self.toolbar = toolbar
     self.tileset = self.toolbar.get_tileset()
     self.canvas = gtk.DrawingArea()
@@ -47,18 +48,14 @@ class Canvas():
     self.tilemap[(4, 0)] = 0
     self.tileset.add()
     self.keys_down = set()
-
-  def load_tileset(self, tile_width, tile_height, tileset):
-    self.tileset.load_tileset(tile_width, tile_height, tileset)
-    # self.canvas.queue_draw()
-
-  def load_tilemap(self, proto):
+    self.fm = file_manager.FileManager(self)
+    tileset, proto = self.fm.open(filename)
+    self.tileset.load_tileset(proto.tileWidth, proto.tileHeight, tileset)
     self.width = proto.width
     self.height = proto.height
     self.tilemap = {}
     for index in proto.tiles:
       self.tilemap[(index % self.width, int(index / self.width))] = proto.tiles[index]
-    self.canvas.queue_draw()
 
   def update(self):
     if self.button_left_down:
@@ -77,6 +74,7 @@ class Canvas():
       tile = self.tileset.get(tile_id)
       tile.draw(ctx, self.pixel_size, tile_pos)
     self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
+    self.tileset.draw_tiles()
 
   def key_press(self, widget, event):
     self.keys_down.add(event.keyval)
@@ -89,6 +87,9 @@ class Canvas():
     self.toolbar.key_release(widget, event)
     self.update()
     widget.queue_draw()
+
+  def get_tileset(self):
+    return self.tileset
 
   def get_pixel(self, pixel_x, pixel_y):
     tile_x = int(pixel_x / self.tileset.get_tile_width())
@@ -164,5 +165,5 @@ class Canvas():
   def save(self, filename):
     pass
 
-def create(window, toolbar):
-  return Canvas(window, toolbar)
+def create(filename, window, toolbar):
+  return Canvas(filename, window, toolbar)

@@ -36,6 +36,8 @@ class Canvas():
     self.pixel_size = 10.0 # each pixel is 10 times as large
     self.button_left_down = False
     self.button_middle_down = False
+    self.width = 5
+    self.height = 5
     self.tilemap = {} # looks like: (x, y) -> tile_id
     self.tilemap[(0, 0)] = 0
     self.tilemap[(1, 0)] = 0

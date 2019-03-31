@@ -14,16 +14,28 @@ class Tileset():
     self.tile_width = tile_width
     self.tile_height = tile_height
     self.tiles = [] # array of Tile objects
+    self.selected_tile_id = 0 # index if tile selected in gui
+    self.grid = gtk.Grid() # for GUI
+    self.grid_width = 2 # button accros on the grid
+
+  def widget(self):
+    return self.grid
+
+  def draw_tiles(self):
+    for tile in self.tiles:
+      tile.update_button()
 
   def load_tileset(self, width, height, tileset):
     self.tile_width = width
     self.tile_height = height
     self.tiles = []
+    for button in self.grid.get_children():
+      self.grid.remove(button)
     index = 0
     for tile_img in tileset:
-      self.tiles.append(Tile(width, height))
-      self.tiles[index].load_image(tile_img)
-      index += 1
+      self.add()
+      tile = self.tiles[len(self.tiles) - 1]
+      tile.load_image(tile_img)
 
   def get_tile_width(self):
     return self.tile_width
@@ -33,12 +45,21 @@ class Tileset():
 
   def add(self):
     self.tiles.append(Tile(self.tile_width, self.tile_height))
+    new_tile_id = len(self.tiles) - 1
+    self.grid.attach(self.tiles[new_tile_id].widget(),
+        new_tile_id % self.grid_width,
+        int(new_tile_id / self.grid_width),
+        1,
+        1)
 
   def get(self, tile_id):
     return self.tiles[tile_id]
 
   def remove(self, tile_id):
     del self.tiles[tile_id]
+
+  def get_selected_tile():
+    return self.selected_tile_id
 
 # Single tile. Will be drawn multiple times on canvas
 class Tile():
@@ -50,12 +71,31 @@ class Tile():
     self.pixels = self.img.load()
     self.update_pattern()
 
+  def update_button(self):
+    self.button_drawing_area.queue_draw()
+
+  def draw_button(self, widget, ctx):
+    mat = cairo.Matrix() # to get rid of the translation on the pattern when drawing on the canvas
+    self.pattern.set_matrix(mat)
+    ctx.scale(widget.get_allocated_width() / self.img.width,
+        widget.get_allocated_height() / self.img.height)
+    ctx.set_source(self.pattern)
+    ctx.paint()
+
+  def widget(self):
+    button = gtk.Button(relief=gtk.ReliefStyle.NORMAL)
+    button.set_size_request(32, 32 * 1.35)
+    self.button_drawing_area = gtk.DrawingArea()
+    self.button_drawing_area.connect("draw", self.draw_button)
+    button.add(self.button_drawing_area)
+    return button
+
   def load_image(self, img):
     if img.width != self.width or img.height != self.height:
       raise "WTF NOT GOOD IMG"
     self.img = img
+    self.pixels = self.img.load()
     self.update_pattern()
-
 
   def update_pattern(self):
     arr = bytearray(self.img.tobytes('raw', 'BGRa'))

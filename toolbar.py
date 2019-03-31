@@ -1,6 +1,9 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk as gtk
+from gi.repository import GdkPixbuf as gdkPixbuf
+from gi.repository import Gdk as gdk
+import cairo
 
 class Toolbar():
   def __init__(self, window, tileset, tool_settings):
@@ -8,10 +11,17 @@ class Toolbar():
     self.tool_settings = tool_settings
     self.current_tool = 1
     self.tools = []
-    self.tools.append(ColorPicker())
-    self.tools.append(Brush())
-    self.tools.append(Eraser())
+    self.tools.append(ColorPicker(0))
+    self.tools.append(Brush(1))
+    self.tools.append(Eraser(2))
     self.keys_down = set()
+    self.grid = gtk.Grid()
+    i = 0
+    for tool in self.tools: # for a 2 wide grid
+      button = tool.widget()
+      button.connect("clicked", self.click)
+      self.grid.attach(button, i % 2, i / 2, 1, 1)
+      i += 1
 
   def key_press(self, widget, event):
     self.keys_down.add(event.keyval)
@@ -29,6 +39,7 @@ class Toolbar():
     return self.tileset
 
   def click(self, widget):
+    self.current_tool = widget.index
     pass
 
   def draw_cursor(self, ctx, cursor_x, cursor_y):
@@ -38,13 +49,13 @@ class Toolbar():
       self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size())
 
   def widget(self):
-    return gtk.Button(label="Click Here")
+    return self.grid
 
 def create(window, tileset, tool_settings):
   return Toolbar(window, tileset, tool_settings)
 
 class Tool():
-  def __init__(self):
+  def __init__(self, index):
     pass
 
   def use(self, canvas, pixel_x, pixel_y, settings):
@@ -53,9 +64,27 @@ class Tool():
   def draw_cursor(self, ctx, cursor_x, cursor_y, size):
     pass
 
+  def widget(self):
+    self.button_surface = cairo.ImageSurface.create_from_png(self.button_path)
+    self.button_pattern = cairo.SurfacePattern(self.button_surface)
+    button = gtk.Button()
+    button.set_size_request(32, 32 * 1.35)
+    button.index = self.index
+    da = gtk.DrawingArea()
+    da.connect("draw", self.draw_button)
+    button.add(da)
+    return button
+
+  def draw_button(self, widget, ctx):
+    ctx.scale(widget.get_allocated_width() / self.button_surface.get_width(),
+        widget.get_allocated_height() / self.button_surface.get_height())
+    ctx.set_source(self.button_pattern)
+    ctx.paint()
+
 class Brush(Tool):
-  def __init__(self):
-    pass
+  def __init__(self, index):
+    self.index = index
+    self.button_path = "./assets/pencil.png"
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     for x in range(int(pixel_x - settings.get_size() / 2 + 0.5), int(pixel_x + settings.get_size() / 2 + 0.5)):
@@ -68,8 +97,9 @@ class Brush(Tool):
     ctx.fill()
 
 class ColorPicker(Tool):
-  def __init__(self):
-    pass
+  def __init__(self, index):
+    self.index = index
+    self.button_path = "./assets/eye-dropper.png"
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     settings.set_color(canvas.get_pixel(pixel_x, pixel_y))
@@ -80,12 +110,14 @@ class ColorPicker(Tool):
     ctx.fill()
 
 class Eraser(Tool):
-  def __init__(self):
+  def __init__(self, index):
+    self.index = index
+    self.button_path = "./assets/eraser.png"
     self.radius = 1
     self.color = (1, 0, 0, 1) # rgba
 
   def use(self, canvas, pixel_x, pixel_y, settings):
-    canvas.set_pixel(pixel_x, pixel_y, (0, 0, 0, 0))
+    canvas.set_pixel(pixel_x, pixel_y, gdk.Color(0, 0, 0))
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, size):
     ctx.set_source_rgba(1, 1, 1, 1)

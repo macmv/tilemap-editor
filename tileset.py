@@ -16,7 +16,9 @@ class Tileset():
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = 0 # index if tile selected in gui
     self.grid = gtk.Grid() # for GUI
+    self.grid.show()
     self.grid_width = 2 # button accros on the grid
+    self.add()
     self.add()
 
   def widget(self):
@@ -45,13 +47,27 @@ class Tileset():
     return self.tile_height
 
   def add(self):
-    self.tiles.append(Tile(self.tile_width, self.tile_height))
+    self.tiles.append(Tile(self.tile_width, self.tile_height, len(self.tiles)))
     new_tile_id = len(self.tiles) - 1
-    self.grid.attach(self.tiles[new_tile_id].widget(),
+    widget = self.tiles[new_tile_id].widget()
+    if new_tile_id == 0:
+      widget.set_active(True)
+    widget.connect("clicked", self.select_tile)
+    self.grid.attach(widget,
         new_tile_id % self.grid_width,
         int(new_tile_id / self.grid_width),
         1,
         1)
+
+  def select_tile(self, widget):
+    print(self)
+    self.selected_tile_id = widget.index
+    i = 0
+    for tile in self.tiles:
+      if i != self.selected_tile_id:
+        tile.button.set_active(False)
+      i += 1
+    self.tiles[self.selected_tile_id].button.set_active(True)
 
   def get(self, tile_id):
     return self.tiles[tile_id]
@@ -64,12 +80,20 @@ class Tileset():
 
 # Single tile. Will be drawn multiple times on canvas
 class Tile():
-  def __init__(self, width, height):
+  def __init__(self, width, height, index):
     self.width = width
     self.height = height
     self.img = Image.new('RGB', (width, height), 'black')
     self.img.putalpha(256)
     self.pixels = self.img.load()
+    self.button = gtk.ToggleButton(relief=gtk.ReliefStyle.NORMAL)
+    self.button.set_size_request(32, 32 * 1.35)
+    self.button.index = index
+    self.button_drawing_area = gtk.DrawingArea()
+    self.button_drawing_area.connect("draw", self.draw_button)
+    self.button_drawing_area.show()
+    self.button.add(self.button_drawing_area)
+    self.button.show()
     self.update_pattern()
 
   def update_button(self):
@@ -84,14 +108,7 @@ class Tile():
     ctx.paint()
 
   def widget(self):
-    button = gtk.Button(relief=gtk.ReliefStyle.NORMAL)
-    button.set_size_request(32, 32 * 1.35)
-    self.button_drawing_area = gtk.DrawingArea()
-    self.button_drawing_area.connect("draw", self.draw_button)
-    self.button_drawing_area.show()
-    button.add(self.button_drawing_area)
-    button.show()
-    return button
+    return self.button
 
   def load_image(self, img):
     if img.width != self.width or img.height != self.height:

@@ -50,8 +50,7 @@ class Toolbar():
       if i != self.current_tool:
         tool.button.set_active(False)
       i += 1
-    if self.tools[self.current_tool].button.get_active() == False:
-      self.tools[self.current_tool].button.set_active(True)
+    self.tools[self.current_tool].button.set_active(True)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
     if 65507 in self.keys_down:
@@ -145,6 +144,7 @@ class TilePlacer(Tool):
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     selected_index = canvas.get_tileset().get_selected_tile()
+    print(selected_index)
     canvas.place_tile(int(pixel_x / canvas.get_tileset().get_tile_width()),
         int(pixel_y / canvas.get_tileset().get_tile_height()),
         selected_index)

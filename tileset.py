@@ -17,6 +17,7 @@ class Tileset():
     self.selected_tile_id = 0 # index if tile selected in gui
     self.grid = gtk.Grid() # for GUI
     self.grid_width = 2 # button accros on the grid
+    self.add()
 
   def widget(self):
     return self.grid
@@ -58,7 +59,7 @@ class Tileset():
   def remove(self, tile_id):
     del self.tiles[tile_id]
 
-  def get_selected_tile():
+  def get_selected_tile(self):
     return self.selected_tile_id
 
 # Single tile. Will be drawn multiple times on canvas

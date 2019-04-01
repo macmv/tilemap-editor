@@ -25,6 +25,13 @@ class Canvas():
     self.keys_down = set()
     self.fm = file_manager.FileManager(self)
 
+  def place_tile(self, x, y, id):
+    if x < self.width and x >= 0 and y < self.height and y >= 0:
+      self.tilemap[(x, y)] = id
+
+  def get_toolbar(self):
+    return self.toolbar
+
   def load_from_file(self, filename):
     tileset, proto = self.fm.open(filename)
     self.tileset.load_tileset(proto.tileWidth, proto.tileHeight, tileset)
@@ -42,20 +49,39 @@ class Canvas():
       self.toolbar.use(self, self.pixel_x, self.pixel_y)
 
   def draw(self, widget, ctx):
-    widget.show()
     ctx.translate(self.offset_x, self.offset_y)
     ctx.scale(self.pixel_size, self.pixel_size)
     ctx.set_antialias(cairo.ANTIALIAS_NONE)
     style = widget.get_style_context()
     width = widget.get_allocated_width()
     height = widget.get_allocated_height()
-    gtk.render_background(style, ctx, 0, 0, width, height)
+    self.draw_background(widget, ctx)
 
     for tile_pos, tile_id in self.tilemap.items():
       tile = self.tileset.get(tile_id)
       tile.draw(ctx, self.pixel_size, tile_pos)
-    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y)
+    self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y, self)
     self.tileset.draw_tiles()
+
+  def draw_background(self, widget, ctx):
+    ctx.set_source_rgba(1, 1, 1, 1)
+    for x in range(self.width * 4):
+      for y in range(self.height * 4):
+        if (x + y) % 2 == 0:
+          ctx.rectangle(x * self.tileset.tile_width / 4,
+              y * self.tileset.tile_height / 4,
+              self.tileset.tile_width / 4,
+              self.tileset.tile_height / 4)
+    ctx.fill()
+    ctx.set_source_rgba(0.8, 0.8, 0.8, 1)
+    for x in range(self.width * 4):
+      for y in range(self.height * 4):
+        if (x + y) % 2 == 1:
+          ctx.rectangle(x * self.tileset.tile_width / 4,
+              y * self.tileset.tile_height / 4,
+              self.tileset.tile_width / 4,
+              self.tileset.tile_height / 4)
+    ctx.fill()
 
   def key_press(self, widget, event):
     self.keys_down.add(event.keyval)
@@ -136,9 +162,6 @@ class Canvas():
     self.cursor_y = event.y
     self.update()
     widget.queue_draw()
-
-  def widget(self):
-    return self.event_box
 
 def load_from_file(filename, window, toolbar):
   c = Canvas(window, toolbar)

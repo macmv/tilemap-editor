@@ -10,6 +10,7 @@ import tool_settings as tool_settings_module
 class CanvasManager:
   def __init__(self, window, toolbar):
     self.window = window
+    self.toolbar = toolbar
     self.tool_settings = tool_settings_module.create(window)
     self.canvases = []
     self.current_canvas = -1
@@ -31,6 +32,9 @@ class CanvasManager:
       | gdk.EventMask.POINTER_MOTION_MASK
       | gdk.EventMask.SCROLL_MASK)
     self.event_box.add(self.da)
+
+  def get_current_canvas(self):
+    return self.canvases[self.current_canvas]
 
   def draw(self, widget, ctx):
     if self.canvases:
@@ -73,9 +77,10 @@ class CanvasManager:
 
   def new(self, dialog):
     tileset = tileset_module.create(16, 16)
-    toolbar = toolbar_module.create(self.window, tileset, self.tool_settings)
-    canvas = canvas_module.load_from_settings(5, 5, self.window, toolbar)
+    self.toolbar.set_tileset(tileset)
+    canvas = canvas_module.load_from_settings(5, 5, self.window, self.toolbar)
     self.canvases.append(canvas)
+    self.window.update_tileset(tileset)
 
 def create(window, toolbar):
   return CanvasManager(window, toolbar)

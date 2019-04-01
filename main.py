@@ -18,21 +18,24 @@ class MyWindow(gtk.Window):
     header.props.show_close_button = True
     self.set_titlebar(header)
 
-    grid = gtk.Grid()
-    self.add(grid)
+    self.grid = gtk.Grid()
+    self.add(self.grid)
 
     tileset = tileset_module.create(16, 16)
     tool_settings = tool_settings_module.create(self)
     toolbar = toolbar_module.create(self, tileset, tool_settings)
-    canvas_manager = canvas_manager_module.create(self, toolbar)
-    menu_bar = menu_bar_module.create(self, canvas_manager)
+    self.canvas_manager = canvas_manager_module.create(self, toolbar)
+    menu_bar = menu_bar_module.create(self, self.canvas_manager)
 
-    grid.attach(menu_bar.widget(), 0, 0, 5, 1)
-    grid.attach(toolbar.widget(), 1, 1, 1, 1)
-    grid.attach(tool_settings.widget(), 1, 2, 1, 2)
-    grid.attach(canvas_manager.widget(), 2, 1, 2, 3)
-    grid.attach(tileset.widget(), 4, 1, 1, 1)
-    grid.attach(gtk.Button(label="Click Here"), 4, 2, 1, 2)
+    self.grid.attach(menu_bar.widget(), 0, 0, 5, 1)
+    self.grid.attach(toolbar.widget(), 1, 1, 1, 1)
+    self.grid.attach(tool_settings.widget(), 1, 2, 1, 2)
+    self.grid.attach(self.canvas_manager.widget(), 2, 1, 2, 3)
+    self.grid.attach(tileset.widget(), 4, 1, 1, 1)
+    self.grid.attach(gtk.Button(label="Click Here"), 4, 2, 1, 2)
+
+  def update_tileset(self, tileset):
+    self.grid.attach(tileset.widget(), 4, 1, 1, 1)
 
 win = MyWindow()
 win.show_all()

@@ -68,7 +68,7 @@ class CanvasManager:
     return self.event_box
 
   def open(self, filename):
-    canvas = canvas_module.load_from_file(filename, self.window)
+    canvas = canvas_module.load_from_file(filename, self.window, self.toolbar)
     self.canvases.append(canvas)
 
   def save(self, filename):

@@ -12,8 +12,14 @@ class FileManager:
     tileset = self.create_tileset()
     tileset.save(filename + ".png", "PNG")
     proto = self.create_tilemap()
+    proto.tileset_length = self.get_tileset_length()
     with open(filename + ".map", "wb") as f:
       f.write(proto.SerializeToString())
+
+  def get_tileset_length(self):
+    tileset = self.canvas.tileset
+    tiles = tileset.tiles
+    return len(tiles)
 
   def create_tileset(self):
     tileset = self.canvas.tileset
@@ -42,8 +48,8 @@ class FileManager:
     proto = tilemap_pb2.Tilemap()
     for x, y in tilemap:
       proto.tiles[y * self.canvas.width + x] = tilemap[(x, y)]
-    proto.tileWidth = self.canvas.tileset.get_tile_width()
-    proto.tileHeight = self.canvas.tileset.get_tile_height()
+    proto.tile_width = self.canvas.tileset.get_tile_width()
+    proto.tile_height = self.canvas.tileset.get_tile_height()
     proto.width = self.canvas.width
     proto.height = self.canvas.height
     return proto
@@ -53,8 +59,8 @@ class FileManager:
     with open(filename + ".map", "rb") as f:
       proto.ParseFromString(f.read())
       print(proto)
-    tileset_arr = self.load_tileset(proto.tileWidth,
-        proto.tileHeight,
+    tileset_arr = self.load_tileset(proto.tile_width,
+        proto.tile_height,
         filename)
     return tileset_arr, proto
 

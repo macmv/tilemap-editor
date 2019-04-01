@@ -34,7 +34,7 @@ class Canvas():
 
   def load_from_file(self, filename):
     tileset, proto = self.fm.open(filename)
-    self.tileset.load_tileset(proto.tileWidth, proto.tileHeight, tileset)
+    self.tileset.load_tileset(proto.tile_width, proto.tile_height, tileset, proto.tileset_length)
     self.width = proto.width
     self.height = proto.height
     self.tilemap = {}

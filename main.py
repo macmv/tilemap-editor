@@ -13,6 +13,8 @@ class MyWindow(gtk.Window):
     gtk.Window.__init__(self)
     self.connect("destroy", gtk.main_quit)
     self.set_default_size(300, 250)
+    settings = gtk.Settings.get_default()
+    settings.set_property("gtk-application-prefer-dark-theme", True)
 
     header = gtk.HeaderBar(title="Tile Editor")
     header.props.show_close_button = True

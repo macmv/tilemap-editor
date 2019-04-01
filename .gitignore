@@ -1,1 +1,10 @@
 __pycache__
+test.map
+test.png
+# Unnecessary Krita files. May change over time
+assets/.eraser.kra-autosave.kra
+assets/eraser.kra~
+assets/eraser.png~
+assets/eye-dropper.kra~
+assets/pencil.kra~
+assets/pencil.png~

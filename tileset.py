@@ -87,7 +87,9 @@ class Tile():
     button.set_size_request(32, 32 * 1.35)
     self.button_drawing_area = gtk.DrawingArea()
     self.button_drawing_area.connect("draw", self.draw_button)
+    self.button_drawing_area.show()
     button.add(self.button_drawing_area)
+    button.show()
     return button
 
   def load_image(self, img):
@@ -126,5 +128,5 @@ class Tile():
     ctx.rectangle(tile_x * self.width, tile_y * self.height, self.width, self.height)
     ctx.fill()
 
-def create():
-  return Tileset(16, 16)
+def create(width, height):
+  return Tileset(width, height)

@@ -7,27 +7,9 @@ import file_manager
 
 # Stores all the tiles arranged in a grid. Also renders everything
 class Canvas():
-  def __init__(self, filename, window, toolbar): # Toolbar instance. Will contain selected tool from left side
+  def __init__(self, window, toolbar): # Toolbar instance. Will contain selected tool from left side
     self.toolbar = toolbar
     self.tileset = self.toolbar.get_tileset()
-    self.canvas = gtk.DrawingArea()
-    self.canvas.set_size_request(960, 540) # 0.5 * 1080p
-    self.canvas.set_hexpand(True)
-    self.canvas.set_vexpand(True)
-    self.canvas.connect("draw", self.draw)
-    self.event_box = gtk.EventBox()
-    window.connect("key-press-event", self.key_press)
-    window.connect("key-release-event", self.key_release)
-    self.event_box.connect("button-press-event", self.click)
-    self.event_box.connect("button-release-event", self.release)
-    self.event_box.connect("motion-notify-event", self.move)
-    self.event_box.connect("scroll-event", self.scroll)
-    self.event_box.add_events(
-        gdk.EventMask.BUTTON_PRESS_MASK
-      | gdk.EventMask.BUTTON_RELEASE_MASK
-      | gdk.EventMask.POINTER_MOTION_MASK
-      | gdk.EventMask.SCROLL_MASK)
-    self.event_box.add(self.canvas)
     self.pixel_x = 0
     self.pixel_y = 0
     self.offset_x = 0.0
@@ -37,18 +19,13 @@ class Canvas():
     self.pixel_size = 10.0 # each pixel is 10 times as large
     self.button_left_down = False
     self.button_middle_down = False
-    self.width = 5
-    self.height = 5
+    self.width = 0
+    self.height = 0
     self.tilemap = {} # looks like: (x, y) -> tile_id
-    self.tilemap[(0, 0)] = 0
-    self.tilemap[(1, 0)] = 0
-    self.tilemap[(2, 0)] = 0
-    self.tilemap[(2, 1)] = 0
-    self.tilemap[(3, 0)] = 0
-    self.tilemap[(4, 0)] = 0
-    self.tileset.add()
     self.keys_down = set()
     self.fm = file_manager.FileManager(self)
+
+  def load_from_file(self, filename):
     tileset, proto = self.fm.open(filename)
     self.tileset.load_tileset(proto.tileWidth, proto.tileHeight, tileset)
     self.width = proto.width
@@ -57,11 +34,15 @@ class Canvas():
     for index in proto.tiles:
       self.tilemap[(index % self.width, int(index / self.width))] = proto.tiles[index]
 
+  def save(self, filename):
+    self.fm.save(filename)
+
   def update(self):
     if self.button_left_down:
       self.toolbar.use(self, self.pixel_x, self.pixel_y)
 
   def draw(self, widget, ctx):
+    widget.show()
     ctx.translate(self.offset_x, self.offset_y)
     ctx.scale(self.pixel_size, self.pixel_size)
     ctx.set_antialias(cairo.ANTIALIAS_NONE)
@@ -159,11 +140,13 @@ class Canvas():
   def widget(self):
     return self.event_box
 
-  def open(self, filename):
-    pass
+def load_from_file(filename, window, toolbar):
+  c = Canvas(window, toolbar)
+  c.load_from_file(filename)
+  return c
 
-  def save(self, filename):
-    pass
-
-def create(filename, window, toolbar):
-  return Canvas(filename, window, toolbar)
+def load_from_settings(width, height, window, toolbar):
+  c = Canvas(window, toolbar)
+  c.width = width
+  c.height = height
+  return c

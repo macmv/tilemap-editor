@@ -3,8 +3,9 @@ syntax = "proto3";
 
 message Tilemap {
   map<int64, int64> tiles = 1; // key = y * width + x, or x = index % width, y = int(index / width)
-  int64 tileWidth = 2; // in pixels
-  int64 tileHeight = 3; // ^
+  int64 tile_width = 2; // in pixels
+  int64 tile_height = 3; // ^
   int64 width = 4; // in tiles
   int64 height = 5; // ^
+  int64 tileset_length = 6; // number of tiles in the tileset
 }

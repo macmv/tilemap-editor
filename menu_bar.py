@@ -37,11 +37,10 @@ class MenuBar():
     r = dialog.run()
     dialog.close()
     if r == gtk.ResponseType.OK:
-      print("Creating new canvas")
       self.canvas_manager.new(dialog)
 
   def open_file(self, widget):
-    dialog = gtk.FileChooserDialog("Please choose a file", None,
+    dialog = gtk.FileChooserDialog("Choose a file", None,
       gtk.FileChooserAction.OPEN,
       (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
        gtk.STOCK_OPEN, gtk.ResponseType.OK))
@@ -51,27 +50,27 @@ class MenuBar():
     dialog.add_filter(filter_text)
 
     response = dialog.run()
+    dialog.close()
+
     if response == gtk.ResponseType.OK:
       self.canvas_manager.open(dialog.get_filename())
-    dialog.destroy()
 
   def save_file(self, widget):
-    dialog = gtk.FileChooserDialog("Please choose where to save", None,
+    dialog = gtk.FileChooserDialog("", None,
       gtk.FileChooserAction.SAVE,
       (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
        gtk.STOCK_SAVE, gtk.ResponseType.OK))
     filter_text = gtk.FileFilter()
-    filter_text.set_name("Image files")
-    filter_text.add_pattern("*.png")
+    filter_text.set_name("Map files")
+    filter_text.add_pattern("*.map")
     dialog.add_filter(filter_text)
 
     response = dialog.run()
+    dialog.close()
+
     if response == gtk.ResponseType.OK:
       filename = dialog.get_filename()
-      if filename.endswith('.png') or filename.endswith('.map'):
-        filename = filename[:-4]
       self.canvas_manager.save(filename)
-    dialog.destroy()
 
   def create_edit(self):
     menu = gtk.Menu()

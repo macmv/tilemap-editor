@@ -56,7 +56,7 @@ class MenuBar():
       self.canvas_manager.open(dialog.get_filename())
 
   def save_file(self, widget):
-    dialog = gtk.FileChooserDialog("", None,
+    dialog = gtk.FileChooserDialog("Please choose where to save", None,
       gtk.FileChooserAction.SAVE,
       (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
        gtk.STOCK_SAVE, gtk.ResponseType.OK))

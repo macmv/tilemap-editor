@@ -41,8 +41,19 @@ class MenuBar():
       self.canvas_manager.new(dialog)
 
   def open_file(self, widget):
-    # TODO: add gui here
-    self.canvas_manager.open("test")
+    dialog = gtk.FileChooserDialog("Please choose a file", None,
+      gtk.FileChooserAction.OPEN,
+      (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
+       gtk.STOCK_OPEN, gtk.ResponseType.OK))
+    filter_text = gtk.FileFilter()
+    filter_text.set_name("Map files")
+    filter_text.add_pattern("*.map")
+    dialog.add_filter(filter_text)
+
+    response = dialog.run()
+    if response == gtk.ResponseType.OK:
+      self.canvas_manager.open(dialog.get_filename())
+    dialog.destroy()
 
   def save_file(self, widget):
     # TODO: add gui here

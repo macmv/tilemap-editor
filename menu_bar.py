@@ -56,8 +56,22 @@ class MenuBar():
     dialog.destroy()
 
   def save_file(self, widget):
-    # TODO: add gui here
-    self.canvas_manager.save("test")
+    dialog = gtk.FileChooserDialog("Please choose where to save", None,
+      gtk.FileChooserAction.SAVE,
+      (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
+       gtk.STOCK_SAVE, gtk.ResponseType.OK))
+    filter_text = gtk.FileFilter()
+    filter_text.set_name("Image files")
+    filter_text.add_pattern("*.png")
+    dialog.add_filter(filter_text)
+
+    response = dialog.run()
+    if response == gtk.ResponseType.OK:
+      filename = dialog.get_filename()
+      if filename.endswith('.png') or filename.endswith('.map'):
+        filename = filename[:-4]
+      self.canvas_manager.save(filename)
+    dialog.destroy()
 
   def create_edit(self):
     menu = gtk.Menu()

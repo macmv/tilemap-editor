@@ -10,10 +10,10 @@ class FileManager:
   def save(self, filename):
     print("Saving")
     tileset = self.create_tileset()
-    tileset.save(filename, "PNG")
+    tileset.save(filename + ".png", "PNG")
     proto = self.create_tilemap()
     proto.tileset_length = self.get_tileset_length()
-    with open(filename[:-4] + ".map", "wb") as f:
+    with open(filename + ".map", "wb") as f:
       f.write(proto.SerializeToString())
 
   def get_tileset_length(self):

@@ -28,16 +28,16 @@ class Tileset():
     for tile in self.tiles:
       tile.update_button()
 
-  def load_tileset(self, width, height, tileset, length):
+  def load_tileset(self, width, height, tileset):
     self.tile_width = width
     self.tile_height = height
     self.tiles = []
     for button in self.grid.get_children():
       self.grid.remove(button)
-    for i in range(length):
+    for image in tileset:
       self.add()
       tile = self.tiles[len(self.tiles) - 1]
-      tile.load_image(tileset[i])
+      tile.load_image(image)
 
   def get_tile_width(self):
     return self.tile_width
@@ -59,7 +59,6 @@ class Tileset():
         1)
 
   def select_tile(self, widget):
-    print(self)
     self.selected_tile_id = widget.index
     i = 0
     for tile in self.tiles:

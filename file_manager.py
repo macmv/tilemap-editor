@@ -2,6 +2,7 @@
 from PIL import Image
 import math
 import tilemap_pb2
+import io
 
 class FileManager:
   def __init__(self, canvas):
@@ -9,10 +10,8 @@ class FileManager:
 
   def save(self, filename):
     print("Saving")
-    tileset = self.create_tileset()
-    tileset.save(filename + ".png", "PNG")
     proto = self.create_tilemap()
-    proto.tileset_length = self.get_tileset_length()
+    tileset = self.create_tileset(proto)
     with open(filename + ".map", "wb") as f:
       f.write(proto.SerializeToString())
 
@@ -21,27 +20,21 @@ class FileManager:
     tiles = tileset.tiles
     return len(tiles)
 
-  def create_tileset(self):
+  def create_tileset(self, proto):
     tileset = self.canvas.tileset
     tiles = tileset.tiles
     length = len(tiles)
     tileset_width = 5 # 5 tiles per line. Change in settings in future
     tile_width = tileset.get_tile_width()
     tile_height = tileset.get_tile_height()
-    tileset_image = Image.new('RGB',
-        (tile_width * tileset_width,
-        tile_height * (int(length / tileset_width) + 1)),
-        'black')
-    tileset_image.putalpha(0)
-    index = 0
     for tile in tileset.tiles:
-      pil_img = tile.img
-      tileset_image.paste(pil_img,
-        ((index % tileset_width) * tile_width,
-        int(index / tileset_width) * tile_height),
-        pil_img)
-      index += 1
-    return tileset_image
+      tile_proto = proto.tileset.add()
+      tile_proto.width = tile_width
+      tile_proto.height = tile_height
+      img_byte_arr = io.BytesIO()
+      tile.img.save(img_byte_arr, format='PNG')
+      img_byte_arr = img_byte_arr.getvalue()
+      tile_proto.image_data = img_byte_arr
 
   def create_tilemap(self):
     tilemap = self.canvas.tilemap
@@ -59,22 +52,12 @@ class FileManager:
     with open(filename, "rb") as f:
       proto.ParseFromString(f.read())
       print(proto)
-    tileset_arr = self.load_tileset(proto.tile_width,
-        proto.tile_height,
-        filename)
+    tileset_arr = self.load_tileset(proto)
     return tileset_arr, proto
 
-  def load_tileset(self, tileWidth, tileHeight, filename): # creates an array of images
-    tileset_image = Image.open(filename[:-4] + ".png")
+  def load_tileset(self, proto): # creates an array of images
+    tileset_bytes = proto.tileset
     tileset_arr = []
-    img_width, img_height = tileset_image.size
-    tileset_width = int(img_width / tileWidth)
-    tileset_height = int(img_height / tileHeight)
-    for y in range(tileset_height):
-      for x in range(tileset_width):
-        tile_img = tileset_image.crop((x * tileWidth,
-            y * tileHeight,
-            x * tileWidth + tileWidth,
-            y * tileHeight + tileHeight))
-        tileset_arr.append(tile_img)
+    for tile_data in tileset_bytes:
+      tileset_arr.append(Image.open(io.BytesIO(tile_data.image_data)))
     return tileset_arr

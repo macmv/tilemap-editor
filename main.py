@@ -37,8 +37,6 @@ class MyWindow(gtk.Window):
     self.grid.attach(gtk.Button(label="Click Here"), 4, 2, 1, 2)
 
   def update_tileset(self, tileset):
-    print("Updating tileset!")
-    print(tileset)
     for widget in self.grid.get_children():
       if (self.grid.child_get_property(widget, "top_attach") == 1 and
           self.grid.child_get_property(widget, "left_attach") == 4):

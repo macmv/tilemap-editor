@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\rtilemap.proto\"\xbb\x01\n\x07Tilemap\x12\"\n\x05tiles\x18\x01 \x03(\x0b\x32\x13.Tilemap.TilesEntry\x12\x12\n\ntile_width\x18\x02 \x01(\x03\x12\x13\n\x0btile_height\x18\x03 \x01(\x03\x12\r\n\x05width\x18\x04 \x01(\x03\x12\x0e\n\x06height\x18\x05 \x01(\x03\x12\x16\n\x07tileset\x18\x06 \x03(\x0b\x32\x05.Tile\x1a,\n\nTilesEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x03:\x02\x38\x01\"9\n\x04Tile\x12\r\n\x05width\x18\x01 \x01(\x03\x12\x0e\n\x06height\x18\x02 \x01(\x03\x12\x12\n\nimage_data\x18\x03 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\rtilemap.proto\"\xb4\x01\n\x07Tilemap\x12\"\n\x05tiles\x18\x01 \x03(\x0b\x32\x13.Tilemap.TilesEntry\x12\x12\n\ntile_width\x18\x02 \x01(\x03\x12\x13\n\x0btile_height\x18\x03 \x01(\x03\x12\r\n\x05width\x18\x04 \x01(\x03\x12\x0e\n\x06height\x18\x05 \x01(\x03\x12\x0f\n\x07tileset\x18\x06 \x03(\x0c\x1a,\n\nTilesEntry\x12\x0b\n\x03key\x18\x01 \x01(\x03\x12\r\n\x05value\x18\x02 \x01(\x03:\x02\x38\x01\x62\x06proto3')
 )
 
 
@@ -59,8 +59,8 @@ _TILEMAP_TILESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=161,
-  serialized_end=205,
+  serialized_start=154,
+  serialized_end=198,
 )
 
 _TILEMAP = _descriptor.Descriptor(
@@ -107,7 +107,7 @@ _TILEMAP = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='tileset', full_name='Tilemap.tileset', index=5,
-      number=6, type=11, cpp_type=10, label=3,
+      number=6, type=12, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -125,59 +125,12 @@ _TILEMAP = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=18,
-  serialized_end=205,
-)
-
-
-_TILE = _descriptor.Descriptor(
-  name='Tile',
-  full_name='Tile',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='width', full_name='Tile.width', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='height', full_name='Tile.height', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='image_data', full_name='Tile.image_data', index=2,
-      number=3, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=207,
-  serialized_end=264,
+  serialized_end=198,
 )
 
 _TILEMAP_TILESENTRY.containing_type = _TILEMAP
 _TILEMAP.fields_by_name['tiles'].message_type = _TILEMAP_TILESENTRY
-_TILEMAP.fields_by_name['tileset'].message_type = _TILE
 DESCRIPTOR.message_types_by_name['Tilemap'] = _TILEMAP
-DESCRIPTOR.message_types_by_name['Tile'] = _TILE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Tilemap = _reflection.GeneratedProtocolMessageType('Tilemap', (_message.Message,), dict(
@@ -194,13 +147,6 @@ Tilemap = _reflection.GeneratedProtocolMessageType('Tilemap', (_message.Message,
   ))
 _sym_db.RegisterMessage(Tilemap)
 _sym_db.RegisterMessage(Tilemap.TilesEntry)
-
-Tile = _reflection.GeneratedProtocolMessageType('Tile', (_message.Message,), dict(
-  DESCRIPTOR = _TILE,
-  __module__ = 'tilemap_pb2'
-  # @@protoc_insertion_point(class_scope:Tile)
-  ))
-_sym_db.RegisterMessage(Tile)
 
 
 _TILEMAP_TILESENTRY._options = None

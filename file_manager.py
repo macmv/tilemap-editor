@@ -28,13 +28,10 @@ class FileManager:
     tile_width = tileset.get_tile_width()
     tile_height = tileset.get_tile_height()
     for tile in tileset.tiles:
-      tile_proto = proto.tileset.add()
-      tile_proto.width = tile_width
-      tile_proto.height = tile_height
       img_byte_arr = io.BytesIO()
       tile.img.save(img_byte_arr, format='PNG')
       img_byte_arr = img_byte_arr.getvalue()
-      tile_proto.image_data = img_byte_arr
+      proto.tileset.append(img_byte_arr)
 
   def create_tilemap(self):
     tilemap = self.canvas.tilemap
@@ -59,5 +56,5 @@ class FileManager:
     tileset_bytes = proto.tileset
     tileset_arr = []
     for tile_data in tileset_bytes:
-      tileset_arr.append(Image.open(io.BytesIO(tile_data.image_data)))
+      tileset_arr.append(Image.open(io.BytesIO(tile_data)))
     return tileset_arr

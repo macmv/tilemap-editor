@@ -7,6 +7,7 @@ from gi.repository import GLib as gLib
 import array
 import cairo
 from PIL import Image
+import image_button
 
 # Stores all the tiles created. Can be selected and drawn onto canvas to be edited
 class Tileset():
@@ -16,6 +17,9 @@ class Tileset():
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = 0 # index if tile selected in gui
     self.grid = gtk.Grid() # for GUI
+    self.new_button = image_button.Button("assets/pencil.png")
+    self.grid.attach(self.new_button.widget(), 0, 0, 1, 1)
+    self.new_button.widget().connect("clicked", self.add)
     self.grid.show()
     self.grid_width = 2 # button accros on the grid
     self.add()
@@ -45,7 +49,7 @@ class Tileset():
   def get_tile_height(self):
     return self.tile_height
 
-  def add(self):
+  def add(self, event):
     self.tiles.append(Tile(self.tile_width, self.tile_height, len(self.tiles)))
     new_tile_id = len(self.tiles) - 1
     widget = self.tiles[new_tile_id].widget()
@@ -54,7 +58,7 @@ class Tileset():
     widget.connect("clicked", self.select_tile)
     self.grid.attach(widget,
         new_tile_id % self.grid_width,
-        int(new_tile_id / self.grid_width),
+        int(new_tile_id / self.grid_width) + 1, # for the new and remove buttons at the top
         1,
         1)
 

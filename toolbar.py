@@ -74,6 +74,8 @@ class Tool():
     da = gtk.DrawingArea()
     da.connect("draw", self.draw_button)
     self.button.add(da)
+    da.show()
+    self.button.show()
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     pass

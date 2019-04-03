@@ -12,7 +12,7 @@ class FileManager:
     print("Saving")
     proto = self.create_tilemap()
     tileset = self.create_tileset(proto)
-    with open(filename + ".map", "wb") as f:
+    with open(filename, "wb") as f:
       f.write(proto.SerializeToString())
 
   def get_tileset_length(self):

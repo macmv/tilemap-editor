@@ -20,10 +20,11 @@ class Tileset():
     self.new_button = image_button.Button("assets/pencil.png")
     self.grid.attach(self.new_button.widget(), 0, 0, 1, 1)
     self.new_button.widget().connect("clicked", self.add)
+    self.delete_button = image_button.Button("assets/eraser.png")
+    self.grid.attach(self.delete_button.widget(), 1, 0, 1, 1)
+    self.delete_button.widget().connect("clicked", self.remove_selected)
+    self.grid_width = 2 # buttons across on the grid
     self.grid.show()
-    self.grid_width = 2 # button accros on the grid
-    self.add()
-    self.add()
 
   def widget(self):
     return self.grid
@@ -39,7 +40,7 @@ class Tileset():
     for button in self.grid.get_children():
       self.grid.remove(button)
     for image in tileset:
-      self.add()
+      self.add(None)
       tile = self.tiles[len(self.tiles) - 1]
       tile.load_image(image)
 
@@ -65,6 +66,7 @@ class Tileset():
   def select_tile(self, widget):
     self.selected_tile_id = widget.index
     i = 0
+    # need to check avoid recursive loop
     for tile in self.tiles:
       if i != self.selected_tile_id:
         tile.button.set_active(False)
@@ -74,8 +76,28 @@ class Tileset():
   def get(self, tile_id):
     return self.tiles[tile_id]
 
-  def remove(self, tile_id):
-    del self.tiles[tile_id]
+  def remove_selected(self, event):
+    if self.selected_tile_id == -1:
+      return
+    tile = self.tiles[self.selected_tile_id]
+    tile.destroy()
+    del self.tiles[self.selected_tile_id]
+    self.update_grid()
+    self.selected_tile_id = -1
+
+  def update_grid(self):
+    if self.selected_tile_id == -1:
+      return
+    i = 0
+    for tile in self.tiles:
+      self.grid.remove(tile.widget())
+      self.grid.attach(tile.widget(),
+          i % self.grid_width,
+          int(i / self.grid_width) + 1, # for the new and remove buttons at the top
+          1,
+          1)
+      tile.widget().index = i
+      i += 1
 
   def get_selected_tile(self):
     return self.selected_tile_id
@@ -100,6 +122,10 @@ class Tile():
 
   def update_button(self):
     self.button_drawing_area.queue_draw()
+
+  def destroy(self):
+    self.button.destroy()
+    self.button_drawing_area.destroy()
 
   def draw_button(self, widget, ctx):
     mat = cairo.Matrix() # to get rid of the translation on the pattern when drawing on the canvas
@@ -147,6 +173,9 @@ class Tile():
     ctx.set_source(self.pattern)
     ctx.rectangle(tile_x * self.width, tile_y * self.height, self.width, self.height)
     ctx.fill()
+
+  def __repr__(self):
+    return "Tile <index=" + str(self.button.index) + ">"
 
 def create(width, height):
   return Tileset(width, height)

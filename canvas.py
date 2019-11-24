@@ -59,7 +59,8 @@ class Canvas():
 
     for tile_pos, tile_id in self.tilemap.items():
       tile = self.tileset.get(tile_id)
-      tile.draw(ctx, self.pixel_size, tile_pos)
+      # already transforming ctx, don't want to transform tile, so use 1 for pixel size
+      tile.draw(ctx, 1, tile_pos)
     self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y, self)
     self.tileset.draw_tiles()
 

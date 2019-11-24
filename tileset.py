@@ -39,8 +39,8 @@ class Tileset():
     self.grid_width = 2 # total width of grid
     self.grid.show()
 
-    self.pixel_size = 4
-    self.tiles_per_row = 2
+    self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
+    self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
 
   def widget(self):
     return self.grid
@@ -53,8 +53,6 @@ class Tileset():
     self.tile_width = width
     self.tile_height = height
     self.tiles = []
-    for button in self.grid.get_children():
-      self.grid.remove(button)
     for image in tileset:
       self.add(None)
       tile = self.tiles[len(self.tiles) - 1]
@@ -104,6 +102,11 @@ class Tileset():
 
   def get_selected_tile(self):
     return self.selected_tile_id
+
+  def destroy(self):
+    for tile in self.tiles:
+      tile.destroy()
+    self.da.destroy()
 
 # Single tile. Will be drawn multiple times on canvas
 class Tile():

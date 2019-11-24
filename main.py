@@ -44,6 +44,7 @@ class MyWindow(gtk.Window):
         break
     self.grid.remove(old_tileset)
     self.grid.attach(tileset.widget(), 4, 1, 1, 1)
+    self.show_all()
 
 win = MyWindow()
 win.show_all()

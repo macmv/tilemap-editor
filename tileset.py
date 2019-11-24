@@ -16,14 +16,15 @@ class Tileset():
     self.tile_height = tile_height
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = -1 # index of tile selected in gui
-    self.grid = gtk.Grid() # main container for everything
+    self.box = gtk.Box(orientation=gtk.Orientation.VERTICAL) # main container for everything
+    self.buttons_box = gtk.Box(orientation=gtk.Orientation.HORIZONTAL) # container for add / delete buttons
 
     self.new_button = image_button.Button("assets/pencil.png")
-    self.grid.attach(self.new_button.widget(), 0, 0, 1, 1)
+    self.buttons_box.pack_start(self.new_button.widget(), False, False, 0)
     self.new_button.widget().connect("clicked", self.add)
 
     self.delete_button = image_button.Button("assets/eraser.png")
-    self.grid.attach(self.delete_button.widget(), 1, 0, 1, 1)
+    self.buttons_box.pack_start(self.delete_button.widget(), False, False, 0)
     self.delete_button.widget().connect("clicked", self.remove_selected)
 
     self.da = gtk.DrawingArea() # will draw tiles in here
@@ -34,16 +35,16 @@ class Tileset():
     self.event_box.connect("button-press-event", self.click)
     self.event_box.add_events(gdk.EventMask.BUTTON_PRESS_MASK)
     self.event_box.add(self.da)
-    self.grid.attach(self.event_box, 0, 1, 1, 1)
 
-    self.grid_width = 2 # total width of grid
-    self.grid.show()
+    self.box.pack_start(self.buttons_box, False, False, 0)
+    self.box.pack_start(self.event_box, True, True, 0)
+    self.box.show()
 
     self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
     self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
 
   def widget(self):
-    return self.grid
+    return self.box
 
   def draw_tiles(self):
     for tile in self.tiles:
@@ -77,7 +78,9 @@ class Tileset():
     tile = self.tiles[self.selected_tile_id]
     tile.destroy()
     del self.tiles[self.selected_tile_id]
-    self.selected_tile_id = -1
+    if self.selected_tile_id >= len(self.tiles):
+      self.selected_tile_id = -1
+    self.da.queue_draw()
 
   def click(self, widget, event):
     tile_x = int(event.x / self.tile_width / self.pixel_size)
@@ -91,13 +94,13 @@ class Tileset():
   def draw(self, widget, ctx):
     i = 0
     for tile in self.tiles:
-      tile.draw(ctx, self.pixel_size, (i % self.tiles_per_row, int(i / self.tiles_per_row)))
+      tile.draw(ctx, self.pixel_size, (i % self.tiles_per_row * 9 / 8, int(i / self.tiles_per_row) * 9 / 8))
       i += 1
     if self.selected_tile_id >= 0:
       x = self.selected_tile_id % self.tiles_per_row * self.tile_width * self.pixel_size
       y = int(self.selected_tile_id / self.tiles_per_row) * self.tile_height * self.pixel_size
       ctx.set_source_rgb(1, 1, 1)
-      ctx.rectangle(x, y, self.tile_width * self.pixel_size, self.tile_height * self.pixel_size)
+      ctx.rectangle(x * 9 / 8, y * 9 / 8, self.tile_width * self.pixel_size, self.tile_height * self.pixel_size)
       ctx.stroke()
 
   def get_selected_tile(self):

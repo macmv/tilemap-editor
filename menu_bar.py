@@ -108,10 +108,28 @@ class NewDialog(gtk.Dialog):
 
     self.set_default_size(150, 100)
 
-    label = gtk.Label("This is a dialog to display additional information")
-
     box = self.get_content_area()
-    box.add(label)
+
+    width_box = gtk.Box()
+    width_box.add(gtk.Label("Map Width:"))
+    width_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
+    box.add(width_box)
+
+    height_box = gtk.Box()
+    height_box.add(gtk.Label("Map Height:"))
+    height_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
+    box.add(height_box)
+
+    tile_width_box = gtk.Box()
+    tile_width_box.add(gtk.Label("Tile Width:"))
+    tile_width_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
+    box.add(tile_width_box)
+
+    tile_height_box = gtk.Box()
+    tile_height_box.add(gtk.Label("Tile Height:"))
+    tile_height_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
+    box.add(tile_height_box)
+
     self.show_all()
 
 def create(window, canvas):

@@ -4,6 +4,7 @@ from gi.repository import Gtk as gtk
 from gi.repository import GdkPixbuf as gdkPixbuf
 from gi.repository import Gdk as gdk
 import cairo
+import image_button
 
 class Toolbar():
   def __init__(self, window, tileset, tool_settings):
@@ -23,7 +24,7 @@ class Toolbar():
       button.connect("clicked", self.click)
       self.grid.attach(button, i % 2, i / 2, 1, 1)
       i += 1
-    self.tools[self.current_tool].button.set_active(True)
+    self.tools[self.current_tool].widget().set_active(True)
 
   def set_tileset(self, tileset):
     self.tileset = tileset
@@ -48,9 +49,9 @@ class Toolbar():
     i = 0
     for tool in self.tools:
       if i != self.current_tool:
-        tool.button.set_active(False)
+        tool.widget().set_active(False)
       i += 1
-    self.tools[self.current_tool].button.set_active(True)
+    self.tools[self.current_tool].widget().set_active(True)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
     if 65507 in self.keys_down:
@@ -66,16 +67,8 @@ def create(window, tileset, tool_settings):
 
 class Tool():
   def __init__(self, index):
-    self.button_surface = cairo.ImageSurface.create_from_png(self.button_path)
-    self.button_pattern = cairo.SurfacePattern(self.button_surface)
-    self.button = gtk.ToggleButton()
-    self.button.set_size_request(32, 32 * 1.35)
-    self.button.index = self.index
-    da = gtk.DrawingArea()
-    da.connect("draw", self.draw_button)
-    self.button.add(da)
-    da.show()
-    self.button.show()
+    self.button = image_button.ToggleButton(self.button_path)
+    self.button.widget().index = index
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     pass
@@ -84,13 +77,10 @@ class Tool():
     pass
 
   def widget(self):
-    return self.button
+    return self.button.widget()
 
   def draw_button(self, widget, ctx):
-    ctx.scale(widget.get_allocated_width() / self.button_surface.get_width(),
-        widget.get_allocated_height() / self.button_surface.get_height())
-    ctx.set_source(self.button_pattern)
-    ctx.paint()
+    self.button.draw_button(widget, ctx)
 
 class Brush(Tool):
   def __init__(self, index):

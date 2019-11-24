@@ -15,16 +15,32 @@ class Tileset():
     self.tile_width = tile_width
     self.tile_height = tile_height
     self.tiles = [] # array of Tile objects
-    self.selected_tile_id = 0 # index if tile selected in gui
-    self.grid = gtk.Grid() # for GUI
+    self.selected_tile_id = -1 # index of tile selected in gui
+    self.grid = gtk.Grid() # main container for everything
+
     self.new_button = image_button.Button("assets/pencil.png")
     self.grid.attach(self.new_button.widget(), 0, 0, 1, 1)
     self.new_button.widget().connect("clicked", self.add)
+
     self.delete_button = image_button.Button("assets/eraser.png")
     self.grid.attach(self.delete_button.widget(), 1, 0, 1, 1)
     self.delete_button.widget().connect("clicked", self.remove_selected)
-    self.grid_width = 2 # buttons across on the grid
+
+    self.da = gtk.DrawingArea() # will draw tiles in here
+    self.da.connect("draw", self.draw)
+    self.da.set_vexpand(True)
+    self.da.set_hexpand(True)
+    self.event_box = gtk.EventBox()
+    self.event_box.connect("button-press-event", self.click)
+    self.event_box.add_events(gdk.EventMask.BUTTON_PRESS_MASK)
+    self.event_box.add(self.da)
+    self.grid.attach(self.event_box, 0, 1, 1, 1)
+
+    self.grid_width = 2 # total width of grid
     self.grid.show()
+
+    self.pixel_size = 4
+    self.tiles_per_row = 2
 
   def widget(self):
     return self.grid
@@ -52,26 +68,7 @@ class Tileset():
 
   def add(self, event):
     self.tiles.append(Tile(self.tile_width, self.tile_height, len(self.tiles)))
-    new_tile_id = len(self.tiles) - 1
-    widget = self.tiles[new_tile_id].widget()
-    if new_tile_id == 0:
-      widget.set_active(True)
-    widget.connect("clicked", self.select_tile)
-    self.grid.attach(widget,
-        new_tile_id % self.grid_width,
-        int(new_tile_id / self.grid_width) + 1, # for the new and remove buttons at the top
-        1,
-        1)
-
-  def select_tile(self, widget):
-    self.selected_tile_id = widget.index
-    i = 0
-    # need to check avoid recursive loop
-    for tile in self.tiles:
-      if i != self.selected_tile_id:
-        tile.button.set_active(False)
-      i += 1
-    self.tiles[self.selected_tile_id].button.set_active(True)
+    self.da.queue_draw()
 
   def get(self, tile_id):
     return self.tiles[tile_id]
@@ -82,22 +79,28 @@ class Tileset():
     tile = self.tiles[self.selected_tile_id]
     tile.destroy()
     del self.tiles[self.selected_tile_id]
-    self.update_grid()
     self.selected_tile_id = -1
 
-  def update_grid(self):
-    if self.selected_tile_id == -1:
-      return
+  def click(self, widget, event):
+    tile_x = int(event.x / self.tile_width / self.pixel_size)
+    tile_y = int(event.y / self.tile_height / self.pixel_size)
+    index = tile_y * self.tiles_per_row + tile_x
+    if index >= len(self.tiles):
+      index = -1
+    self.selected_tile_id = index
+    self.da.queue_draw()
+
+  def draw(self, widget, ctx):
     i = 0
     for tile in self.tiles:
-      self.grid.remove(tile.widget())
-      self.grid.attach(tile.widget(),
-          i % self.grid_width,
-          int(i / self.grid_width) + 1, # for the new and remove buttons at the top
-          1,
-          1)
-      tile.widget().index = i
+      tile.draw(ctx, self.pixel_size, (i % self.tiles_per_row, int(i / self.tiles_per_row)))
       i += 1
+    if self.selected_tile_id >= 0:
+      x = self.selected_tile_id % self.tiles_per_row * self.tile_width * self.pixel_size
+      y = int(self.selected_tile_id / self.tiles_per_row) * self.tile_height * self.pixel_size
+      ctx.set_source_rgb(1, 1, 1)
+      ctx.rectangle(x, y, self.tile_width * self.pixel_size, self.tile_height * self.pixel_size)
+      ctx.stroke()
 
   def get_selected_tile(self):
     return self.selected_tile_id
@@ -169,9 +172,13 @@ class Tile():
     tile_x, tile_y = tile_pos
     mat = cairo.Matrix() # apparently this needs to be negative ¯\_(ツ)_/¯
     mat.translate(-tile_x * self.width, -tile_y * self.height)
+    mat.scale(1 / pixel_size, 1 / pixel_size)
     self.pattern.set_matrix(mat)
     ctx.set_source(self.pattern)
-    ctx.rectangle(tile_x * self.width, tile_y * self.height, self.width, self.height)
+    ctx.rectangle(tile_x * self.width * pixel_size,
+            tile_y * self.height * pixel_size,
+            self.width * pixel_size,
+            self.height * pixel_size)
     ctx.fill()
 
   def __repr__(self):

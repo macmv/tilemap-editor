@@ -107,6 +107,7 @@ class Tileset():
     return self.selected_tile_id
 
   def destroy(self):
+    raise "no yeetage"
     for tile in self.tiles:
       tile.destroy()
     self.da.destroy()

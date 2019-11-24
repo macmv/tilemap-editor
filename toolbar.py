@@ -27,7 +27,6 @@ class Toolbar():
     self.tools[self.current_tool].widget().set_active(True)
 
   def set_tileset(self, tileset):
-    self.tileset.destroy()
     self.tileset = tileset
 
   def key_press(self, widget, event):

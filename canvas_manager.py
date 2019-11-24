@@ -33,6 +33,14 @@ class CanvasManager:
       | gdk.EventMask.SCROLL_MASK)
     self.event_box.add(self.da)
 
+    self.tab_switcher = gtk.Box(orientation=gtk.Orientation.HORIZONTAL)
+    self.tab_switcher.show()
+
+    self.box = gtk.Box(orientation=gtk.Orientation.VERTICAL)
+    self.box.pack_start(self.tab_switcher, False, False, 0)
+    self.box.pack_start(self.event_box, True, True, 0)
+    self.box.show()
+
   def get_current_canvas(self):
     return self.canvases[self.current_canvas]
 
@@ -65,11 +73,12 @@ class CanvasManager:
       self.canvases[self.current_canvas].key_release(widget, event)
 
   def widget(self):
-    return self.event_box
+    return self.box
 
   def open(self, filename):
     canvas = canvas_module.load_from_file(filename, self.window, self.toolbar)
     self.canvases.append(canvas)
+    self.add_tab()
 
   def save(self, filename):
     if self.canvases:
@@ -81,6 +90,18 @@ class CanvasManager:
     canvas = canvas_module.load_from_settings(5, 5, self.window, self.toolbar)
     self.canvases.append(canvas)
     self.window.update_tileset(tileset)
+    self.add_tab()
+
+  def add_tab(self):
+    button = gtk.Button()
+    button.connect("clicked", self.set_canvas)
+    button.id = len(self.canvases) - 1
+    self.tab_switcher.pack_start(button, False, False, 0)
+
+  def set_canvas(self, widget):
+    self.current_canvas = widget.id
+    canvas = self.canvases[self.current_canvas]
+    self.window.update_tileset(canvas.tileset)
 
 def create(window, toolbar):
   return CanvasManager(window, toolbar)

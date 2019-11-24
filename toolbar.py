@@ -54,7 +54,6 @@ class Toolbar():
     return self.tileset
 
   def set_tool(self, index):
-    print("SETTING TOOL", index)
     # deels with the fact that set_active creates a click event
     if index == self.prev_tool:
       return

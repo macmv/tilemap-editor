@@ -41,6 +41,8 @@ class CanvasManager:
     self.box.pack_start(self.event_box, True, True, 0)
     self.box.show()
 
+    self.new(None)
+
   def get_current_canvas(self):
     return self.canvases[self.current_canvas]
 
@@ -96,6 +98,7 @@ class CanvasManager:
     button = gtk.Button()
     button.connect("clicked", self.set_canvas)
     button.id = len(self.canvases) - 1
+    button.show()
     self.tab_switcher.pack_start(button, False, False, 0)
 
   def set_canvas(self, widget):

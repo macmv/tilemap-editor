@@ -33,16 +33,17 @@ class MyWindow(gtk.Window):
     self.grid.attach(toolbar.widget(), 1, 1, 1, 1)
     self.grid.attach(tool_settings.widget(), 1, 2, 1, 2)
     self.grid.attach(canvas_manager.widget(), 2, 1, 2, 3)
-    self.grid.attach(tileset.widget(), 4, 1, 1, 1)
     self.grid.attach(gtk.Button(label="Click Here"), 4, 2, 1, 2)
 
   def update_tileset(self, tileset):
+    old_tileset = None
     for widget in self.grid.get_children():
       if (self.grid.child_get_property(widget, "top_attach") == 1 and
           self.grid.child_get_property(widget, "left_attach") == 4):
         old_tileset = widget
         break
-    self.grid.remove(old_tileset)
+    if old_tileset != None:
+      self.grid.remove(old_tileset)
     self.grid.attach(tileset.widget(), 4, 1, 1, 1)
     self.show_all()
 

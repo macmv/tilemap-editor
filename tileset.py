@@ -43,12 +43,13 @@ class Tileset():
     self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
     self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
 
+    self.add(None)
+
   def widget(self):
     return self.box
 
-  def draw_tiles(self):
-    for tile in self.tiles:
-      tile.update_button()
+  def update(self):
+    self.da.queue_draw()
 
   def load_tileset(self, width, height, tileset):
     self.tile_width = width

@@ -62,7 +62,7 @@ class Canvas():
       # already transforming ctx, don't want to transform tile, so use 1 for pixel size
       tile.draw(ctx, 1, tile_pos)
     self.toolbar.draw_cursor(ctx, self.pixel_x, self.pixel_y, self)
-    self.tileset.draw_tiles()
+    self.tileset.update()
 
   def draw_background(self, widget, ctx):
     ctx.set_source_rgba(1, 1, 1, 1)

@@ -10,6 +10,7 @@ class Toolbar():
   def __init__(self, window, tileset, tool_settings):
     self.tileset = tileset
     self.tool_settings = tool_settings
+    self.prev_tool = 1
     self.current_tool = 1
     self.tools = []
     self.tools.append(ColorPicker(0))
@@ -30,10 +31,17 @@ class Toolbar():
     self.tileset = tileset
 
   def key_press(self, widget, event):
-    self.keys_down.add(event.keyval)
+    key = chr(gdk.keyval_to_unicode(event.keyval))
+    self.keys_down.add(key)
+    if key == 'b':
+      self.set_tool(1)
+    if key == 'e':
+      self.set_tool(2)
+    if key == 'v':
+      self.set_tool(3)
 
   def key_release(self, widget, event):
-    self.keys_down.remove(event.keyval)
+    self.keys_down.remove(chr(gdk.keyval_to_unicode(event.keyval)))
 
   def use(self, canvas, x, y):
     if 65507 in self.keys_down:
@@ -44,14 +52,22 @@ class Toolbar():
   def get_tileset(self):
     return self.tileset
 
-  def click(self, widget):
-    self.current_tool = widget.index
+  def set_tool(self, index):
+    print("SETTING TOOL", index)
+    # deels with the fact that set_active creates a click event
+    if index == self.prev_tool:
+      return
+    self.prev_tool = self.current_tool
+    self.current_tool = index
     i = 0
     for tool in self.tools:
       if i != self.current_tool:
         tool.widget().set_active(False)
       i += 1
     self.tools[self.current_tool].widget().set_active(True)
+
+  def click(self, widget):
+    self.set_tool(widget.index)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
     if 65507 in self.keys_down:

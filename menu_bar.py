@@ -70,7 +70,7 @@ class MenuBar():
 
     if response == gtk.ResponseType.OK:
       filename = dialog.get_filename()
-      if not '.' in str:
+      if not '.' in filename:
         filename = filename + ".map"
       self.canvas_manager.save(filename)
 

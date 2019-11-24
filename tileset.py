@@ -87,6 +87,9 @@ class Tileset():
     tile_x = int(event.x / self.tile_width / self.pixel_size)
     tile_y = int(event.y / self.tile_height / self.pixel_size)
     index = tile_y * self.tiles_per_row + tile_x
+    self.select(index)
+
+  def select(self, index):
     if index >= len(self.tiles):
       index = -1
     self.selected_tile_id = index

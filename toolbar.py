@@ -40,6 +40,18 @@ class Toolbar():
       self.set_tool(2)
     if key == 'v':
       self.set_tool(3)
+    if key == 'c':
+      self.tool_settings.open_color_menu()
+    if key == 'n':
+      self.tileset.add(None)
+    if ord(key) >= 48 and ord(key) <= 58: # if you pressed any number
+      # 48 is key 0, 49 is key 1
+      # key 0 -> tile 10
+      index = ord(key) - 49
+      if index == -1:
+        index = 9
+      self.tileset.select(index) # set the selected tile to that number
+      self.set_tool(3)
 
   def key_release(self, widget, event):
     self.keys_down.remove(event.keyval)

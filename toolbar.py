@@ -32,7 +32,8 @@ class Toolbar():
 
   def key_press(self, widget, event):
     key = chr(gdk.keyval_to_unicode(event.keyval))
-    self.keys_down.add(key)
+    # need to use keyval because control, shift, etc.
+    self.keys_down.add(event.keyval)
     if key == 'b':
       self.set_tool(1)
     if key == 'e':
@@ -41,7 +42,7 @@ class Toolbar():
       self.set_tool(3)
 
   def key_release(self, widget, event):
-    self.keys_down.remove(chr(gdk.keyval_to_unicode(event.keyval)))
+    self.keys_down.remove(event.keyval)
 
   def use(self, canvas, x, y):
     if 65507 in self.keys_down:

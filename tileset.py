@@ -1,9 +1,4 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk as gtk
-from gi.repository import Gdk as gdk
-from gi.repository import GdkPixbuf as gdkPixbuf
-from gi.repository import GLib as gLib
+import wx
 import array
 import cairo
 from PIL import Image
@@ -11,39 +6,45 @@ import image_button
 
 # Stores all the tiles created. Can be selected and drawn onto canvas to be edited
 class Tileset():
-  def __init__(self, tile_width, tile_height):
+  def __init__(self, pnl, tile_width, tile_height):
     self.tile_width = tile_width
     self.tile_height = tile_height
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = -1 # index of tile selected in gui
-    self.box = gtk.Box(orientation=gtk.Orientation.VERTICAL) # main container for everything
-    self.buttons_box = gtk.Box(orientation=gtk.Orientation.HORIZONTAL) # container for add / delete buttons
 
-    self.new_button = image_button.Button("assets/pencil.png")
-    self.buttons_box.pack_start(self.new_button.widget(), False, False, 0)
-    self.new_button.widget().connect("clicked", self.add)
+    self.sizer = wx.BoxSizer(wx.VERTICAL)
+    self.box = wx.Panel(pnl) # main container for everything
+    self.box.SetSizer(self.sizer)
 
-    self.delete_button = image_button.Button("assets/eraser.png")
-    self.buttons_box.pack_start(self.delete_button.widget(), False, False, 0)
-    self.delete_button.widget().connect("clicked", self.remove_selected)
+    self.buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+    self.buttons_box = wx.Panel(self.box) # container for add / delete buttons
+    self.sizer.Add(self.buttons_box, 0, wx.ALL, 5)
+    self.buttons_box.SetSizer(self.buttons_sizer)
 
-    self.da = gtk.DrawingArea() # will draw tiles in here
-    self.da.connect("draw", self.draw)
-    self.da.set_vexpand(True)
-    self.da.set_hexpand(True)
-    self.event_box = gtk.EventBox()
-    self.event_box.connect("button-press-event", self.click)
-    self.event_box.add_events(gdk.EventMask.BUTTON_PRESS_MASK)
-    self.event_box.add(self.da)
+    self.new_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/pencil.png"))
+    self.buttons_sizer.Add(self.new_button, 0, wx.ALL, 5)
 
-    self.box.pack_start(self.buttons_box, False, False, 0)
-    self.box.pack_start(self.event_box, True, True, 0)
-    self.box.show()
+    # self.delete_button = image_button.Button("assets/eraser.png")
+    # self.buttons_box.pack_start(self.delete_button.widget(), False, False, 0)
+    # self.delete_button.widget().connect("clicked", self.remove_selected)
 
-    self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
-    self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
+    # self.da = gtk.DrawingArea() # will draw tiles in here
+    # self.da.connect("draw", self.draw)
+    # self.da.set_vexpand(True)
+    # self.da.set_hexpand(True)
+    # self.event_box = gtk.EventBox()
+    # self.event_box.connect("button-press-event", self.click)
+    # self.event_box.add_events(gdk.EventMask.BUTTON_PRESS_MASK)
+    # self.event_box.add(self.da)
 
-    self.add(None)
+    # self.box.pack_start(self.buttons_box, False, False, 0)
+    # self.box.pack_start(self.event_box, True, True, 0)
+    # self.box.show()
+
+    # self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
+    # self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
+
+    # self.add(None)
 
   def widget(self):
     return self.box
@@ -195,5 +196,5 @@ class Tile():
   def __repr__(self):
     return "Tile <index=" + str(self.button.index) + ">"
 
-def create(width, height):
-  return Tileset(width, height)
+def create(pnl, width, height):
+  return Tileset(pnl, width, height)

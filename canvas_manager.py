@@ -5,20 +5,19 @@ import tileset as tileset_module
 import tool_settings as tool_settings_module
 
 class CanvasManager:
-  def __init__(self, pnl, sizer, toolbar):
-    box = wx.Panel(pnl)
-    sizer.Add(box, 1, wx.EXPAND|wx.ALL, 5)
+  def __init__(self, pnl, toolbar):
+    self.box = wx.Panel(pnl)
     box_sizer = wx.BoxSizer(wx.VERTICAL)
-    box.SetSizer(box_sizer)
+    self.box.SetSizer(box_sizer)
 
-    self.tab_switcher = wx.Panel(pnl)
+    self.tab_switcher = wx.Panel(self.box)
     box_sizer.Add(self.tab_switcher, 0, wx.ALL, 5)
 
     self.toolbar = toolbar
     self.tool_settings = tool_settings_module.create()
     self.canvases = []
     self.current_canvas = -1
-    self.da = wx.Panel(pnl)
+    self.da = wx.Panel(self.box)
     box_sizer.Add(self.da, 1, wx.EXPAND|wx.ALL, 5)
     self.da.Bind(wx.EVT_PAINT, self.draw)
     self.da.Bind(wx.EVT_LEFT_DOWN, self.click)
@@ -117,5 +116,5 @@ class CanvasManager:
     canvas = self.canvases[self.current_canvas]
     self.window.update_tileset(canvas.tileset)
 
-def create(pnl, sizer, toolbar):
-  return CanvasManager(pnl, sizer, toolbar)
+def create(pnl, toolbar):
+  return CanvasManager(pnl, toolbar)

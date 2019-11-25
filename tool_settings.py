@@ -4,8 +4,7 @@ from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
 
 class ToolSettings():
-  def __init__(self, window):
-    self.window = window
+  def __init__(self):
     self.size_slider = gtk.Scale.new_with_range(gtk.Orientation.HORIZONTAL, 1, 10, 1)
     self.size_slider.set_hexpand(True)
     self.grid = gtk.Grid()
@@ -32,5 +31,5 @@ class ToolSettings():
   def widget(self):
     return self.grid
 
-def create(window):
-  return ToolSettings(window)
+def create():
+  return ToolSettings()

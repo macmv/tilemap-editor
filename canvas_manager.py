@@ -5,60 +5,28 @@ import tileset as tileset_module
 import tool_settings as tool_settings_module
 
 class CanvasManager:
-  def __init__(self, pnl, window, toolbar):
-    buttons = [
-            wx.Button(pnl, label="ONE"),
-            wx.Button(pnl, label="TWO"),
-            wx.Button(pnl, label="TREE")]
+  def __init__(self, pnl, sizer, toolbar):
+    box = wx.Panel(pnl)
+    sizer.Add(box, 1, wx.EXPAND|wx.ALL, 5)
+    box_sizer = wx.BoxSizer(wx.VERTICAL)
+    box.SetSizer(box_sizer)
 
-    self.pnl = wx.Panel(pnl)
-    self.pnl.Bind(wx.EVT_PAINT, self.onPaint)
-    self.pnl.SetBackgroundColour("#E6E6E6")
+    self.tab_switcher = wx.Panel(pnl)
+    box_sizer.Add(self.tab_switcher, 0, wx.ALL, 5)
 
-    sizer = wx.BoxSizer(wx.VERTICAL)
-    for btn in buttons:
-      sizer.Add(btn, 0, wx.ALL, 5)
-    sizer.Add(self.pnl, 1, wx.EXPAND|wx.ALL, 5)
-    pnl.SetSizer(sizer)
+    self.toolbar = toolbar
+    self.tool_settings = tool_settings_module.create()
+    self.canvases = []
+    self.current_canvas = -1
+    self.da = wx.Panel(pnl)
+    box_sizer.Add(self.da, 1, wx.EXPAND|wx.ALL, 5)
+    self.da.Bind(wx.EVT_PAINT, self.draw)
+    self.da.Bind(wx.EVT_LEFT_DOWN, self.click)
+    self.da.Bind(wx.EVT_LEFT_UP, self.release)
+    self.da.Bind(wx.EVT_MOTION, self.move)
 
-    # self.add(self.grid)
-
-    # self.window = window
-    # self.toolbar = toolbar
-    # self.tool_settings = tool_settings_module.create(window)
-    # self.canvases = []
-    # self.current_canvas = -1
-    # self.da = gtk.DrawingArea()
-    # self.da.set_size_request(960, 540) # 0.5 * 1080p
-    # self.da.set_hexpand(True)
-    # self.da.set_vexpand(True)
-    # self.da.connect("draw", self.draw)
-    # window.connect("key-press-event", self.key_press)
-    # window.connect("key-release-event", self.key_release)
-    # self.event_box = gtk.EventBox()
-    # self.event_box.connect("button-press-event", self.click)
-    # self.event_box.connect("button-release-event", self.release)
-    # self.event_box.connect("motion-notify-event", self.move)
-    # self.event_box.connect("scroll-event", self.scroll)
-    # self.event_box.add_events(
-    #     gdk.EventMask.BUTTON_PRESS_MASK
-    #   | gdk.EventMask.BUTTON_RELEASE_MASK
-    #   | gdk.EventMask.POINTER_MOTION_MASK
-    #   | gdk.EventMask.SCROLL_MASK)
-    # self.event_box.add(self.da)
-
-    # self.tab_switcher = gtk.Box(orientation=gtk.Orientation.HORIZONTAL)
-    # self.tab_switcher.show()
-
-    # self.box = gtk.Box(orientation=gtk.Orientation.VERTICAL)
-    # self.box.pack_start(self.tab_switcher, False, False, 0)
-    # self.box.pack_start(self.event_box, True, True, 0)
-    # self.box.show()
-
-    # self.new(None)
-
-  def onPaint(self, event):
-    dc = wx.PaintDC(self.pnl)
+  def draw(self, event):
+    dc = wx.PaintDC(self.da)
     dc.SetPen(wx.Pen('#d4d4d4'))
 
     dc.SetBrush(wx.Brush('#c56c00'))
@@ -87,13 +55,11 @@ class CanvasManager:
 
     dc.SetBrush(wx.Brush('#785f36'))
     dc.DrawRectangle(250, 195, 90, 60)
+    if self.canvases:
+      self.canvases[self.current_canvas].draw(widget, ctx)
 
   def get_current_canvas(self):
     return self.canvases[self.current_canvas]
-
-  def draw(self, widget, ctx):
-    if self.canvases:
-      self.canvases[self.current_canvas].draw(widget, ctx)
 
   def click(self, widget, event):
     if self.canvases:
@@ -151,5 +117,5 @@ class CanvasManager:
     canvas = self.canvases[self.current_canvas]
     self.window.update_tileset(canvas.tileset)
 
-def create(pnl, window, toolbar):
-  return CanvasManager(pnl, window, toolbar)
+def create(pnl, sizer, toolbar):
+  return CanvasManager(pnl, sizer, toolbar)

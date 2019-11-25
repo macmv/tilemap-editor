@@ -2,7 +2,7 @@ import wx
 import file_manager
 
 class MenuBar():
-  def __init__(self, pnl, canvas_manager):
+  def __init__(self, canvas_manager):
     self.canvas_manager = canvas_manager
 
     self.mb = wx.MenuBar()
@@ -119,5 +119,5 @@ class NewDialog:
 
     self.show_all()
 
-def create(pnl, canvas):
-  return MenuBar(pnl, canvas)
+def create(canvas):
+  return MenuBar(canvas)

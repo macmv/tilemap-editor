@@ -13,23 +13,34 @@ class TilemapFrame(wx.Frame):
     pnl = wx.Panel(self)
     sizer = wx.BoxSizer(wx.HORIZONTAL)
     pnl.SetSizer(sizer)
-    tileset = tileset_module.create(pnl, 16, 16)
-    tool_settings = tool_settings_module.create(pnl)
-    toolbar = toolbar_module.create(pnl, tileset, tool_settings)
-    canvas_manager = canvas_manager_module.create(pnl, toolbar)
-    menu_bar = menu_bar_module.create(pnl, canvas_manager)
+
+    left_sizer = wx.BoxSizer(wx.VERTICAL)
+    left_pnl = wx.Panel(pnl)
+    left_pnl.SetSizer(left_sizer)
+    sizer.Add(left_pnl, 1, wx.LEFT, 5)
+
+    center_sizer = wx.BoxSizer(wx.VERTICAL)
+    center_pnl = wx.Panel(pnl)
+    center_pnl.SetSizer(center_sizer)
+    sizer.Add(center_pnl, 1, wx.CENTER|wx.EXPAND, 5)
+
+    right_sizer = wx.BoxSizer(wx.VERTICAL)
+    right_pnl = wx.Panel(pnl)
+    right_pnl.SetSizer(right_sizer)
+    sizer.Add(right_pnl, 1, wx.RIGHT, 5)
+
+    tileset = tileset_module.create(right_pnl, 16, 16)
+    tool_settings = tool_settings_module.create(left_pnl)
+    toolbar = toolbar_module.create(left_pnl, tileset, tool_settings)
+    canvas_manager = canvas_manager_module.create(center_pnl, toolbar)
+    menu_bar = menu_bar_module.create(canvas_manager)
 
     self.SetMenuBar(menu_bar.widget())
 
-    sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
-    sizer.Add(tileset.widget(), 1, 0, 5)
-    sizer.Add(tool_settings.widget(), 1, 0, 5)
-    sizer.Add(toolbar.widget(), 1, 0, 5)
-    # self.grid.attach(menu_bar.widget(), 0, 0, 5, 1)
-    # self.grid.attach(toolbar.widget(), 1, 1, 1, 1)
-    # self.grid.attach(tool_settings.widget(), 1, 2, 1, 2)
-    # self.grid.attach(canvas_manager.widget(), 2, 1, 2, 3)
-    # self.grid.attach(gtk.Button(label="Click Here"), 4, 2, 1, 2)
+    left_sizer.Add(toolbar.widget(), 1, 0, 5)
+    left_sizer.Add(tool_settings.widget(), 1, 0, 5)
+    center_sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
+    right_sizer.Add(tileset.widget(), 1, 0, 5)
 
   def OnExit(self, event):
     self.Close(True)

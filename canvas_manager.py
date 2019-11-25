@@ -25,6 +25,9 @@ class CanvasManager:
     self.da.Bind(wx.EVT_PAINT, self.draw)
     self.da.Bind(wx.EVT_LEFT_DOWN, self.click)
     self.da.Bind(wx.EVT_LEFT_UP, self.release)
+    self.da.Bind(wx.EVT_MIDDLE_DOWN, self.click)
+    self.da.Bind(wx.EVT_MIDDLE_UP, self.release)
+    self.da.Bind(wx.EVT_MOUSEWHEEL, self.scroll)
     self.da.Bind(wx.EVT_MOTION, self.move)
 
     self.new(None)
@@ -41,21 +44,23 @@ class CanvasManager:
   def get_current_canvas(self):
     return self.canvases[self.current_canvas]
 
-  def click(self, widget, event):
+  def click(self, event):
     if self.canvases:
-      self.canvases[self.current_canvas].click(widget, event)
+      self.canvases[self.current_canvas].click(event)
 
-  def release(self, widget, event):
+  def release(self, event):
     if self.canvases:
-      self.canvases[self.current_canvas].release(widget, event)
+      self.canvases[self.current_canvas].release(event)
 
   def move(self, event):
     if self.canvases:
       self.canvases[self.current_canvas].move(event)
+      self.da.Refresh()
 
-  def scroll(self, widget, event):
+  def scroll(self, event):
     if self.canvases:
-      self.canvases[self.current_canvas].scroll(widget, event)
+      self.canvases[self.current_canvas].scroll(event)
+      self.da.Refresh()
 
   def key_press(self, widget, event):
     if self.canvases:

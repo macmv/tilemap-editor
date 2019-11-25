@@ -24,9 +24,8 @@ class Tileset():
     self.new_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/pencil.png"))
     self.buttons_sizer.Add(self.new_button, 0, wx.ALL, 5)
 
-    # self.delete_button = image_button.Button("assets/eraser.png")
-    # self.buttons_box.pack_start(self.delete_button.widget(), False, False, 0)
-    # self.delete_button.widget().connect("clicked", self.remove_selected)
+    self.delete_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/eraser.png"))
+    self.buttons_sizer.Add(self.delete_button, 0, wx.ALL, 5)
 
     # self.da = gtk.DrawingArea() # will draw tiles in here
     # self.da.connect("draw", self.draw)

@@ -1,3 +1,4 @@
+import wx
 import cairo
 import file_manager
 
@@ -117,18 +118,17 @@ class Canvas():
           color)
 
   def release(self, event):
-    if event.button == 2:
+    if event.ButtonUp(wx.MOUSE_BTN_MIDDLE):
       self.button_middle_down = False
-    if event.button == 1:
+    if event.ButtonUp(wx.MOUSE_BTN_LEFT):
       self.button_left_down = False
 
   def click(self, event):
-    if event.button == 2:
+    if event.ButtonDown(wx.MOUSE_BTN_MIDDLE):
       self.button_middle_down = True
-    if event.button == 1:
+    if event.ButtonDown(wx.MOUSE_BTN_LEFT):
       self.button_left_down = True
     self.update()
-    widget.queue_draw()
 
   def scroll(self, event):
     if 65507 in self.keys_down:
@@ -138,7 +138,7 @@ class Canvas():
         self.toolbar.tool_settings.set_size(self.toolbar.tool_settings.get_size() - 1)
     else:
       zoom_amount = 0.1
-      if event.direction == gdk.ScrollDirection.UP:
+      if event.GetWheelRotation() > 0:
         self.pixel_size += self.pixel_size * zoom_amount
         self.offset_x -= (zoom_amount * (self.cursor_x - self.offset_x))
         self.offset_y -= (zoom_amount * (self.cursor_y - self.offset_y))

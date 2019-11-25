@@ -14,7 +14,7 @@ class CanvasManager:
     box_sizer.Add(self.tab_switcher, 0, wx.ALL, 5)
 
     self.toolbar = toolbar
-    self.tool_settings = tool_settings_module.create()
+    self.tool_settings = toolbar.tool_settings
     self.canvases = []
     self.current_canvas = -1
     self.da = wx.Panel(self.box)

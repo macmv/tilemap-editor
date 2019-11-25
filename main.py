@@ -14,14 +14,15 @@ class TilemapFrame(wx.Frame):
     sizer = wx.BoxSizer(wx.HORIZONTAL)
     pnl.SetSizer(sizer)
     tileset = tileset_module.create(pnl, 16, 16)
-    toolbar = None
+    tool_settings = tool_settings_module.create(pnl)
+    toolbar = toolbar_module.create(pnl, tileset, tool_settings)
     canvas_manager = canvas_manager_module.create(pnl, toolbar)
-    # tool_settings = tool_settings_module.create(pnl, self)
-    # toolbar = toolbar_module.create(pnl, self, tileset, tool_settings)
     # menu_bar = menu_bar_module.create(pnl, self, canvas_manager)
 
     sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
     sizer.Add(tileset.widget(), 1, 0, 5)
+    sizer.Add(tool_settings.widget(), 1, 0, 5)
+    sizer.Add(toolbar.widget(), 1, 0, 5)
     # self.grid.attach(menu_bar.widget(), 0, 0, 5, 1)
     # self.grid.attach(toolbar.widget(), 1, 1, 1, 1)
     # self.grid.attach(tool_settings.widget(), 1, 2, 1, 2)

@@ -1,17 +1,16 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk as gtk
-from gi.repository import Gdk as gdk
+import wx
 
 class ToolSettings():
-  def __init__(self):
-    self.size_slider = gtk.Scale.new_with_range(gtk.Orientation.HORIZONTAL, 1, 10, 1)
-    self.size_slider.set_hexpand(True)
-    self.grid = gtk.Grid()
-    self.color_button = gtk.ColorButton()
-    self.color_button.set_color(gdk.Color(0, 1, 0))
-    self.grid.attach(self.size_slider, 0, 0, 5, 1)
-    self.grid.attach(self.color_button, 0, 1, 1, 1)
+  def __init__(self, pnl):
+    sizer = wx.BoxSizer(wx.VERTICAL)
+    self.box = wx.Panel(pnl) # main container for everything
+    self.box.SetSizer(sizer)
+
+    self.size_slider = wx.Slider(self.box)
+    sizer.Add(self.size_slider, 1, 0, 5)
+
+    self.color_button = wx.Button(self.box)
+    sizer.Add(self.color_button, 1, 0, 5)
 
   def open_color_menu(self):
     self.color_button.clicked()
@@ -29,7 +28,7 @@ class ToolSettings():
     return self.size_slider.get_value()
 
   def widget(self):
-    return self.grid
+    return self.box
 
-def create():
-  return ToolSettings()
+def create(pnl):
+  return ToolSettings(pnl)

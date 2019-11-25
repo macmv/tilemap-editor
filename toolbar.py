@@ -1,31 +1,28 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk as gtk
-from gi.repository import GdkPixbuf as gdkPixbuf
-from gi.repository import Gdk as gdk
+import wx
 import cairo
 import image_button
 
 class Toolbar():
-  def __init__(self, window, tileset, tool_settings):
+  def __init__(self, pnl, tileset, tool_settings):
     self.tileset = tileset
     self.tool_settings = tool_settings
     self.prev_tool = 1
     self.current_tool = 1
     self.tools = []
-    self.tools.append(ColorPicker(0))
-    self.tools.append(Brush(1))
-    self.tools.append(Eraser(2))
-    self.tools.append(TilePlacer(3))
+    self.box = wx.Panel(pnl)
+    self.tools.append(ColorPicker(0, self.box))
+    self.tools.append(Brush(1, self.box))
+    self.tools.append(Eraser(2, self.box))
+    self.tools.append(TilePlacer(3, self.box))
     self.keys_down = set()
-    self.grid = gtk.Grid()
+    sizer = wx.BoxSizer(wx.VERTICAL)
     i = 0
-    for tool in self.tools: # for a 2 wide grid
+    for tool in self.tools:
       button = tool.widget()
-      button.connect("clicked", self.click)
-      self.grid.attach(button, i % 2, i / 2, 1, 1)
+      # button.connect("clicked", self.click)
+      sizer.Add(button, 1, 0, 5)
       i += 1
-    self.tools[self.current_tool].widget().set_active(True)
+    self.tools[self.current_tool].widget().SetValue(True)
 
   def set_tileset(self, tileset):
     self.tileset = tileset
@@ -88,15 +85,15 @@ class Toolbar():
       self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
 
   def widget(self):
-    return self.grid
+      return self.box
 
-def create(window, tileset, tool_settings):
-  return Toolbar(window, tileset, tool_settings)
+def create(pnl, tileset, tool_settings):
+  return Toolbar(pnl, tileset, tool_settings)
 
 class Tool():
-  def __init__(self, index):
-    self.button = image_button.ToggleButton(self.button_path)
-    self.button.widget().index = index
+  def __init__(self, index, pnl):
+    self.button = wx.ToggleButton(pnl)
+    self.button.index = index
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     pass
@@ -105,16 +102,16 @@ class Tool():
     pass
 
   def widget(self):
-    return self.button.widget()
+    return self.button
 
   def draw_button(self, widget, ctx):
     self.button.draw_button(widget, ctx)
 
 class Brush(Tool):
-  def __init__(self, index):
+  def __init__(self, index, pnl):
     self.index = index
     self.button_path = "./assets/pencil.png"
-    Tool.__init__(self, index)
+    Tool.__init__(self, index, pnl)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     for x in range(int(pixel_x - settings.get_size() / 2 + 0.5), int(pixel_x + settings.get_size() / 2 + 0.5)):
@@ -127,10 +124,10 @@ class Brush(Tool):
     ctx.fill()
 
 class ColorPicker(Tool):
-  def __init__(self, index):
+  def __init__(self, index, pnl):
     self.index = index
     self.button_path = "./assets/eye-dropper.png"
-    Tool.__init__(self, index)
+    Tool.__init__(self, index, pnl)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     settings.set_color(canvas.get_pixel(pixel_x, pixel_y))
@@ -141,11 +138,11 @@ class ColorPicker(Tool):
     ctx.fill()
 
 class Eraser(Tool):
-  def __init__(self, index):
+  def __init__(self, index, pnl):
     self.index = index
     self.button_path = "./assets/eraser.png"
     self.radius = 1
-    Tool.__init__(self, index)
+    Tool.__init__(self, index, pnl)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     canvas.set_pixel(pixel_x, pixel_y, gdk.Color(0, 0, 0))
@@ -156,11 +153,11 @@ class Eraser(Tool):
     ctx.fill()
 
 class TilePlacer(Tool):
-  def __init__(self, index):
+  def __init__(self, index, pnl):
     self.index = index
     self.button_path = "./assets/pencil.png"
     self.radius = 1
-    Tool.__init__(self, index)
+    Tool.__init__(self, index, pnl)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     selected_index = canvas.get_tileset().get_selected_tile()

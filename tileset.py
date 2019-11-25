@@ -12,13 +12,13 @@ class Tileset():
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = -1 # index of tile selected in gui
 
-    self.sizer = wx.BoxSizer(wx.VERTICAL)
+    sizer = wx.BoxSizer(wx.VERTICAL)
     self.box = wx.Panel(pnl) # main container for everything
-    self.box.SetSizer(self.sizer)
+    self.box.SetSizer(sizer)
 
     self.buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
     self.buttons_box = wx.Panel(self.box) # container for add / delete buttons
-    self.sizer.Add(self.buttons_box, 0, wx.ALL, 5)
+    sizer.Add(self.buttons_box, 0, wx.ALL, 5)
     self.buttons_box.SetSizer(self.buttons_sizer)
 
     self.new_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/pencil.png"))

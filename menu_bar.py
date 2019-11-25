@@ -1,36 +1,23 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk as gtk
+import wx
 import file_manager
 
 class MenuBar():
-  def __init__(self, window, canvas_manager):
-    self.window = window
+  def __init__(self, pnl, canvas_manager):
     self.canvas_manager = canvas_manager
 
-    self.mb = gtk.MenuBar()
-    self.mb.append(self.create_file())
-    self.mb.append(self.create_edit())
-    self.mb.append(self.create_tools())
+    self.mb = wx.MenuBar()
+    self.mb.Append(self.create_file(), "File")
+    # self.mb.Append(self.create_edit())
+    # self.mb.Append(self.create_tools())
 
   def widget(self):
     return self.mb
 
   def create_file(self):
-    menu = gtk.Menu()
-    new = gtk.ImageMenuItem(gtk.STOCK_NEW)
-    new.connect("activate", self.new_canvas)
-    menu.append(new)
-    open = gtk.ImageMenuItem(gtk.STOCK_OPEN)
-    open.connect("activate", self.open_file)
-    menu.append(open)
-    save = gtk.ImageMenuItem(gtk.STOCK_SAVE)
-    save.connect("activate", self.save_file)
-    menu.append(save)
+    menu = wx.Menu()
+    menu.Append(wx.ID_NEW, "New File", "Creates a new file", wx.ITEM_NORMAL)
 
-    tab = gtk.MenuItem("File")
-    tab.set_submenu(menu)
-    return tab
+    return menu
 
   def new_canvas(self, widget):
     dialog = NewDialog(self.window)
@@ -96,7 +83,7 @@ class MenuBar():
     tab.set_submenu(menu)
     return tab
 
-class NewDialog(gtk.Dialog):
+class NewDialog:
   def __init__(self, parent):
     gtk.Dialog.__init__(self, "", parent, 0,
         (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
@@ -132,5 +119,5 @@ class NewDialog(gtk.Dialog):
 
     self.show_all()
 
-def create(window, canvas):
-  return MenuBar(window, canvas)
+def create(pnl, canvas):
+  return MenuBar(pnl, canvas)

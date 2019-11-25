@@ -17,7 +17,9 @@ class TilemapFrame(wx.Frame):
     tool_settings = tool_settings_module.create(pnl)
     toolbar = toolbar_module.create(pnl, tileset, tool_settings)
     canvas_manager = canvas_manager_module.create(pnl, toolbar)
-    # menu_bar = menu_bar_module.create(pnl, self, canvas_manager)
+    menu_bar = menu_bar_module.create(pnl, canvas_manager)
+
+    self.SetMenuBar(menu_bar.widget())
 
     sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
     sizer.Add(tileset.widget(), 1, 0, 5)

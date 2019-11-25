@@ -25,7 +25,7 @@ class ToolSettings():
     return self.color_button.get_color()
 
   def get_size(self):
-    return self.size_slider.get_value()
+    return self.size_slider.GetValue()
 
   def widget(self):
     return self.box

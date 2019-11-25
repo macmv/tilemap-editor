@@ -50,7 +50,8 @@ class Tileset():
     return self.box
 
   def update(self):
-    self.da.queue_draw()
+    pass
+    # self.da.queue_draw()
 
   def load_tileset(self, width, height, tileset):
     self.tile_width = width

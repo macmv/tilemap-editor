@@ -1,15 +1,18 @@
 import wx
+import wx.lib.wxcairo
 import canvas as canvas_module
 import toolbar as toolbar_module
 import tileset as tileset_module
 import tool_settings as tool_settings_module
 
 class CanvasManager:
-  def __init__(self, pnl, toolbar):
+  def __init__(self, pnl, window, toolbar):
+    self.window = window
     self.box = wx.Panel(pnl)
     box_sizer = wx.BoxSizer(wx.VERTICAL)
     self.box.SetSizer(box_sizer)
 
+    self.tab_sizer = wx.BoxSizer()
     self.tab_switcher = wx.Panel(self.box)
     box_sizer.Add(self.tab_switcher, 0, wx.ALL, 5)
 
@@ -24,38 +27,16 @@ class CanvasManager:
     self.da.Bind(wx.EVT_LEFT_UP, self.release)
     self.da.Bind(wx.EVT_MOTION, self.move)
 
+    self.new(None)
+
   def draw(self, event):
     dc = wx.PaintDC(self.da)
     dc.SetPen(wx.Pen('#d4d4d4'))
-
     dc.SetBrush(wx.Brush('#c56c00'))
     dc.DrawRectangle(10, 15, 90, 60)
-
-    dc.SetBrush(wx.Brush('#1ac500'))
-    dc.DrawRectangle(130, 15, 90, 60)
-
-    dc.SetBrush(wx.Brush('#539e47'))
-    dc.DrawRectangle(250, 15, 90, 60)
-
-    dc.SetBrush(wx.Brush('#004fc5'))
-    dc.DrawRectangle(10, 105, 90, 60)
-
-    dc.SetBrush(wx.Brush('#c50024'))
-    dc.DrawRectangle(130, 105, 90, 60)
-
-    dc.SetBrush(wx.Brush('#9e4757'))
-    dc.DrawRectangle(250, 105, 90, 60)
-
-    dc.SetBrush(wx.Brush('#5f3b00'))
-    dc.DrawRectangle(10, 195, 90, 60)
-
-    dc.SetBrush(wx.Brush('#4c4c4c'))
-    dc.DrawRectangle(130, 195, 90, 60)
-
-    dc.SetBrush(wx.Brush('#785f36'))
-    dc.DrawRectangle(250, 195, 90, 60)
+    ctx = wx.lib.wxcairo.ContextFromDC(dc)
     if self.canvases:
-      self.canvases[self.current_canvas].draw(widget, ctx)
+      self.canvases[self.current_canvas].draw(ctx)
 
   def get_current_canvas(self):
     return self.canvases[self.current_canvas]
@@ -68,9 +49,9 @@ class CanvasManager:
     if self.canvases:
       self.canvases[self.current_canvas].release(widget, event)
 
-  def move(self, widget, event):
+  def move(self, event):
     if self.canvases:
-      self.canvases[self.current_canvas].move(widget, event)
+      self.canvases[self.current_canvas].move(event)
 
   def scroll(self, widget, event):
     if self.canvases:
@@ -97,7 +78,7 @@ class CanvasManager:
       self.canvases[self.current_canvas].save(filename)
 
   def new(self, dialog):
-    tileset = tileset_module.create(16, 16)
+    tileset = self.window.create_tileset()
     self.toolbar.set_tileset(tileset)
     canvas = canvas_module.load_from_settings(5, 5, self.window, self.toolbar)
     self.canvases.append(canvas)
@@ -105,16 +86,17 @@ class CanvasManager:
     self.add_tab()
 
   def add_tab(self):
-    button = gtk.Button()
-    button.connect("clicked", self.set_canvas)
+    button = wx.Button(self.tab_switcher)
+    button.Bind(wx.EVT_BUTTON, self.set_canvas)
     button.id = len(self.canvases) - 1
-    button.show()
-    self.tab_switcher.pack_start(button, False, False, 0)
+    self.tab_sizer.Add(button, False, False, 0)
 
-  def set_canvas(self, widget):
+  def set_canvas(self, event):
+    widget = event.GetEventObject()
+    print(widget.id)
     self.current_canvas = widget.id
     canvas = self.canvases[self.current_canvas]
     self.window.update_tileset(canvas.tileset)
 
-def create(pnl, toolbar):
-  return CanvasManager(pnl, toolbar)
+def create(pnl, window, toolbar):
+  return CanvasManager(pnl, window, toolbar)

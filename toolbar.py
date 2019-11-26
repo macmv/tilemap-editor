@@ -50,10 +50,10 @@ class Toolbar():
       self.set_tool(3)
 
   def use(self, canvas, x, y):
-    # if 65507 in self.keys_down:
-    #   self.tools[0].use(canvas, x, y, self.tool_settings)
-    # else:
-    self.tools[self.current_tool].use(canvas, x, y, self.tool_settings)
+    if wx.GetKeyState(wx.WXK_CONTROL):
+      self.tools[0].use(canvas, x, y, self.tool_settings)
+    else:
+      self.tools[self.current_tool].use(canvas, x, y, self.tool_settings)
 
   def get_tileset(self):
     return self.tileset
@@ -72,10 +72,10 @@ class Toolbar():
     self.set_tool(widget.index)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
-    # if 65507 in self.keys_down:
-    #   self.tools[0].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
-    # else:
-    self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
+    if wx.GetKeyState(wx.WXK_CONTROL):
+      self.tools[0].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
+    else:
+      self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
 
   def widget(self):
       return self.box
@@ -153,16 +153,17 @@ class TilePlacer(Tool):
     Tool.__init__(self, index, pnl)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
-    selected_index = canvas.get_tileset().get_selected_tile()
-    canvas.place_tile(int(pixel_x / canvas.get_tileset().get_tile_width()),
+    canvas.place_tile(
+        int(pixel_x / canvas.get_tileset().get_tile_width()),
         int(pixel_y / canvas.get_tileset().get_tile_height()),
-        selected_index)
+        canvas.get_tileset().get_selected_tile())
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, size, canvas):
     ctx.set_source_rgba(0.4, 0.4, 1, 1)
     x = int(cursor_x / canvas.get_tileset().get_tile_width())
     y = int(cursor_y / canvas.get_tileset().get_tile_height())
-    ctx.rectangle(x * canvas.get_toolbar().get_tileset().tile_width,
+    ctx.rectangle(
+        x * canvas.get_toolbar().get_tileset().tile_width,
         y * canvas.get_toolbar().get_tileset().tile_height,
         canvas.get_toolbar().get_tileset().tile_width,
         canvas.get_toolbar().get_tileset().tile_height)

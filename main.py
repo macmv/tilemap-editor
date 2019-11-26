@@ -17,17 +17,17 @@ class TilemapFrame(wx.Frame):
     self.left_sizer = wx.BoxSizer(wx.VERTICAL)
     self.left_pnl = wx.Panel(self.pnl)
     self.left_pnl.SetSizer(self.left_sizer)
-    self.sizer.Add(self.left_pnl, 1, wx.LEFT, 5)
+    self.sizer.Add(self.left_pnl, 1, wx.LEFT, 5) # 1/8 of width
 
     self.center_sizer = wx.BoxSizer(wx.VERTICAL)
     self.center_pnl = wx.Panel(self.pnl)
     self.center_pnl.SetSizer(self.center_sizer)
-    self.sizer.Add(self.center_pnl, 1, wx.CENTER|wx.EXPAND, 5)
+    self.sizer.Add(self.center_pnl, 6, wx.CENTER|wx.EXPAND, 5) # 6/8 of width
 
     self.right_sizer = wx.BoxSizer(wx.VERTICAL)
     self.right_pnl = wx.Panel(self.pnl)
     self.right_pnl.SetSizer(self.right_sizer)
-    self.sizer.Add(self.right_pnl, 1, wx.RIGHT, 5)
+    self.sizer.Add(self.right_pnl, 1, wx.RIGHT, 5) # 1/8 of width
 
     tileset = tileset_module.create(self.right_pnl, 16, 16)
     tool_settings = tool_settings_module.create(self.left_pnl)

@@ -66,7 +66,8 @@ class Canvas():
     for x in range(self.width * 4):
       for y in range(self.height * 4):
         if (x + y) % 2 == 0:
-          ctx.rectangle(x * self.tileset.tile_width / 4,
+          ctx.rectangle(
+              x * self.tileset.tile_width / 4,
               y * self.tileset.tile_height / 4,
               self.tileset.tile_width / 4,
               self.tileset.tile_height / 4)
@@ -75,7 +76,8 @@ class Canvas():
     for x in range(self.width * 4):
       for y in range(self.height * 4):
         if (x + y) % 2 == 1:
-          ctx.rectangle(x * self.tileset.tile_width / 4,
+          ctx.rectangle(
+              x * self.tileset.tile_width / 4,
               y * self.tileset.tile_height / 4,
               self.tileset.tile_width / 4,
               self.tileset.tile_height / 4)
@@ -95,7 +97,8 @@ class Canvas():
     if tile_pos in self.tilemap:
       tile_id = self.tilemap[tile_pos]
       tile = self.tileset.get(tile_id)
-      return tile.get_pixel(pixel_x % self.tileset.get_tile_width(),
+      return tile.get_pixel(
+          pixel_x % self.tileset.get_tile_width(),
           pixel_y % self.tileset.get_tile_height())
 
   def set_pixel(self, pixel_x, pixel_y, color):
@@ -105,7 +108,8 @@ class Canvas():
     if tile_pos in self.tilemap:
       tile_id = self.tilemap[tile_pos]
       tile = self.tileset.get(tile_id)
-      tile.set_pixel(pixel_x % self.tileset.get_tile_width(),
+      tile.set_pixel(
+          pixel_x % self.tileset.get_tile_width(),
           pixel_y % self.tileset.get_tile_height(),
           color)
 

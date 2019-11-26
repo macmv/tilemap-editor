@@ -37,8 +37,8 @@ class TilemapFrame(wx.Frame):
 
     self.SetMenuBar(menu_bar.widget())
 
-    self.left_sizer.Add(toolbar.widget(), 1, 0, 5)
-    self.left_sizer.Add(tool_settings.widget(), 1, 0, 5)
+    self.left_sizer.Add(toolbar.widget(), 1, wx.EXPAND, 5)
+    self.left_sizer.Add(tool_settings.widget(), 1, wx.EXPAND, 5)
     self.center_sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
     self.right_sizer.Add(tileset.widget(), 1, 0, 5)
 

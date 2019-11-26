@@ -9,8 +9,30 @@ class ToolSettings():
     self.size_slider = wx.Slider(self.box, value=1, minValue=1, maxValue=10)
     sizer.Add(self.size_slider, 1, wx.EXPAND, 5)
 
-    self.color_button = wx.Button(self.box)
-    sizer.Add(self.color_button, 1, 0, 5)
+    color_sizer = wx.BoxSizer(wx.HORIZONTAL)
+    self.color_picker = wx.Panel(self.box)
+    self.color_picker.SetSizer(color_sizer)
+    sizer.Add(self.color_picker, 1, wx.EXPAND, 5)
+
+    self.color_gradient = wx.Panel(self.color_picker)
+    color_sizer.Add(self.color_gradient, 1, wx.EXPAND, 5)
+    self.color_gradient.Bind(wx.EVT_PAINT, self.draw)
+    self.color_gradient.Bind(wx.EVT_SIZE, self.size)
+
+  def size(self, event):
+    width = self.color_gradient.GetSize().GetWidth()
+    self.color_gradient.SetMinSize((width, width))
+
+  def draw(self, event):
+    width = self.color_gradient.GetSize().GetWidth()
+    dc = wx.PaintDC(self.color_gradient)
+    color = (255, 0, 0)
+    for i in range(width):
+      ratio = i / width
+      dc.GradientFillLinear(
+          wx.Rect(0, i, width, 1),
+          tuple([ratio * j for j in (255, 255, 255)]),
+          tuple([ratio * j for j in color]))
 
   def open_color_menu(self):
     self.color_button.clicked()

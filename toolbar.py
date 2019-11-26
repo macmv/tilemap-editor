@@ -14,7 +14,6 @@ class Toolbar():
     self.tools.append(Brush(1, self.box))
     self.tools.append(Eraser(2, self.box))
     self.tools.append(TilePlacer(3, self.box))
-    self.keys_down = set()
     sizer = wx.BoxSizer(wx.VERTICAL)
     i = 0
     for tool in self.tools:
@@ -27,19 +26,19 @@ class Toolbar():
   def set_tileset(self, tileset):
     self.tileset = tileset
 
-  def key_press(self, widget, event):
-    key = chr(gdk.keyval_to_unicode(event.keyval))
+  def key_press(self, event):
+    key = chr(event.GetUnicodeKey())
+    print(key)
     # need to use keyval because control, shift, etc.
-    self.keys_down.add(event.keyval)
-    if key == 'b':
+    if key == 'B':
       self.set_tool(1)
-    if key == 'e':
+    if key == 'E':
       self.set_tool(2)
-    if key == 'v':
+    if key == 'V':
       self.set_tool(3)
-    if key == 'c':
+    if key == 'C':
       self.tool_settings.open_color_menu()
-    if key == 'n':
+    if key == 'N':
       self.tileset.add(None)
     if ord(key) >= 48 and ord(key) <= 58: # if you pressed any number
       # 48 is key 0, 49 is key 1
@@ -50,39 +49,33 @@ class Toolbar():
       self.tileset.select(index) # set the selected tile to that number
       self.set_tool(3)
 
-  def key_release(self, widget, event):
-    self.keys_down.remove(event.keyval)
-
   def use(self, canvas, x, y):
-    if 65507 in self.keys_down:
-      self.tools[0].use(canvas, x, y, self.tool_settings)
-    else:
-      self.tools[self.current_tool].use(canvas, x, y, self.tool_settings)
+    # if 65507 in self.keys_down:
+    #   self.tools[0].use(canvas, x, y, self.tool_settings)
+    # else:
+    self.tools[self.current_tool].use(canvas, x, y, self.tool_settings)
 
   def get_tileset(self):
     return self.tileset
 
   def set_tool(self, index):
-    # deels with the fact that set_active creates a click event
-    if index == self.prev_tool:
-      return
     self.prev_tool = self.current_tool
     self.current_tool = index
     i = 0
     for tool in self.tools:
       if i != self.current_tool:
-        tool.widget().set_active(False)
+        tool.widget().SetValue(False)
       i += 1
-    self.tools[self.current_tool].widget().set_active(True)
+    self.tools[self.current_tool].widget().SetValue(True)
 
   def click(self, widget):
     self.set_tool(widget.index)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
-    if 65507 in self.keys_down:
-      self.tools[0].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
-    else:
-      self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
+    # if 65507 in self.keys_down:
+    #   self.tools[0].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
+    # else:
+    self.tools[self.current_tool].draw_cursor(ctx, cursor_x, cursor_y, self.tool_settings.get_size(), canvas)
 
   def widget(self):
       return self.box

@@ -82,16 +82,8 @@ class Canvas():
     ctx.fill()
 
   def key_press(self, event):
-    self.keys_down.add(event.keyval)
-    self.toolbar.key_press(widget, event)
+    self.toolbar.key_press(event)
     self.update()
-    widget.queue_draw()
-
-  def key_release(self, event):
-    self.keys_down.remove(event.keyval)
-    self.toolbar.key_release(widget, event)
-    self.update()
-    widget.queue_draw()
 
   def get_tileset(self):
     return self.tileset

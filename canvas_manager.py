@@ -29,14 +29,12 @@ class CanvasManager:
     self.da.Bind(wx.EVT_MIDDLE_UP, self.release)
     self.da.Bind(wx.EVT_MOUSEWHEEL, self.scroll)
     self.da.Bind(wx.EVT_MOTION, self.move)
+    window.Bind(wx.EVT_CHAR_HOOK, self.key_press)
 
     self.new(None)
 
   def draw(self, event):
     dc = wx.PaintDC(self.da)
-    dc.SetPen(wx.Pen('#d4d4d4'))
-    dc.SetBrush(wx.Brush('#c56c00'))
-    dc.DrawRectangle(10, 15, 90, 60)
     ctx = wx.lib.wxcairo.ContextFromDC(dc)
     if self.canvases:
       self.canvases[self.current_canvas].draw(ctx)
@@ -62,13 +60,10 @@ class CanvasManager:
       self.canvases[self.current_canvas].scroll(event)
       self.da.Refresh()
 
-  def key_press(self, widget, event):
+  def key_press(self, event):
     if self.canvases:
-      self.canvases[self.current_canvas].key_press(widget, event)
-
-  def key_release(self, widget, event):
-    if self.canvases:
-      self.canvases[self.current_canvas].key_release(widget, event)
+      self.canvases[self.current_canvas].key_press(event)
+      self.da.Refresh()
 
   def widget(self):
     return self.box

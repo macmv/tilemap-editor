@@ -6,8 +6,8 @@ class ToolSettings():
     self.box = wx.Panel(pnl) # main container for everything
     self.box.SetSizer(sizer)
 
-    self.size_slider = wx.Slider(self.box)
-    sizer.Add(self.size_slider, 1, 0, 5)
+    self.size_slider = wx.Slider(self.box, value=1, minValue=1, maxValue=10)
+    sizer.Add(self.size_slider, 1, wx.EXPAND, 5)
 
     self.color_button = wx.Button(self.box)
     sizer.Add(self.color_button, 1, 0, 5)

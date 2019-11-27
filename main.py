@@ -5,6 +5,7 @@ import canvas_manager as canvas_manager_module
 import toolbar as toolbar_module
 import tool_settings as tool_settings_module
 import tileset as tileset_module
+import wx.lib.inspection
 
 class TilemapFrame(wx.Frame):
   def __init__(self):
@@ -39,8 +40,8 @@ class TilemapFrame(wx.Frame):
 
     self.left_sizer.Add(toolbar.widget(), 1, wx.EXPAND, 5)
     self.left_sizer.Add(tool_settings.widget(), 1, wx.EXPAND, 5)
-    self.center_sizer.Add(canvas_manager.widget(), 2, wx.EXPAND|wx.CENTER, 5)
-    self.right_sizer.Add(tileset.widget(), 1, 0, 5)
+    self.center_sizer.Add(canvas_manager.widget(), 2, wx.EXPAND, 5)
+    self.right_sizer.Add(tileset.widget(), 1, wx.EXPAND, 5)
 
   def create_tileset(self):
     tileset = tileset_module.create(self.right_pnl, 16, 16)
@@ -63,4 +64,6 @@ if __name__ == '__main__':
   app = wx.App()
   frm = TilemapFrame()
   frm.Show()
+  # enable debugging \/
+  # wx.lib.inspection.InspectionTool().Show()
   app.MainLoop()

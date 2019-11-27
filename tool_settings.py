@@ -21,11 +21,12 @@ class ToolSettings():
 
   def size(self, event):
     width = self.color_gradient.GetSize().GetWidth()
-    self.color_gradient.SetMinSize((width, width))
+    self.color_gradient.SetSize((width, width))
 
   def draw(self, event):
     width = self.color_gradient.GetSize().GetWidth()
     dc = wx.PaintDC(self.color_gradient)
+    dc.DestroyClippingRegion()
     color = (255, 0, 0)
     for i in range(width):
       ratio = i / width

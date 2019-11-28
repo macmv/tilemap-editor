@@ -14,13 +14,16 @@ class Toolbar():
     self.tools.append(Brush(1, self.box))
     self.tools.append(Eraser(2, self.box))
     self.tools.append(TilePlacer(3, self.box))
-    sizer = wx.BoxSizer(wx.VERTICAL)
+    sizer = wx.GridBagSizer()
+    self.box.SetSizer(sizer)
     i = 0
     for tool in self.tools:
       button = tool.widget()
       # button.connect("clicked", self.click)
-      sizer.Add(button, 1, 0, 5)
+      sizer.Add(button, pos=(int(i / 2), i % 2), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
       i += 1
+    sizer.AddGrowableCol(0)
+    sizer.AddGrowableCol(1)
     self.tools[self.current_tool].widget().SetValue(True)
 
   def set_tileset(self, tileset):

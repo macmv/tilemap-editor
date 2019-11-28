@@ -10,10 +10,10 @@ class Toolbar():
     self.current_tool = 1
     self.tools = []
     self.box = wx.Panel(pnl)
-    self.tools.append(ColorPicker(0, self.box))
-    self.tools.append(Brush(1, self.box))
-    self.tools.append(Eraser(2, self.box))
-    self.tools.append(TilePlacer(3, self.box))
+    self.tools.append(ColorPicker(0, self))
+    self.tools.append(Brush      (1, self))
+    self.tools.append(Eraser     (2, self))
+    self.tools.append(TilePlacer (3, self))
     sizer = wx.GridBagSizer()
     self.box.SetSizer(sizer)
     i = 0
@@ -71,8 +71,10 @@ class Toolbar():
       i += 1
     self.tools[self.current_tool].widget().SetValue(True)
 
-  def click(self, widget):
-    self.set_tool(widget.index)
+  def click(self, event):
+    # event.GetEventObject() is the button that was pressed
+    # .index is a custom defined property setup in Tool()
+    self.set_tool(event.GetEventObject().index)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, canvas):
     if wx.GetKeyState(wx.WXK_CONTROL):
@@ -87,9 +89,10 @@ def create(pnl, tileset, tool_settings):
   return Toolbar(pnl, tileset, tool_settings)
 
 class Tool():
-  def __init__(self, index, pnl):
-    self.button = wx.ToggleButton(pnl)
+  def __init__(self, index, parent):
+    self.button = wx.ToggleButton(parent.box)
     self.button.index = index
+    self.button.Bind(wx.EVT_TOGGLEBUTTON, parent.click)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     pass
@@ -104,10 +107,10 @@ class Tool():
     self.button.draw_button(widget, ctx)
 
 class Brush(Tool):
-  def __init__(self, index, pnl):
+  def __init__(self, index, parent):
     self.index = index
     self.button_path = "./assets/pencil.png"
-    Tool.__init__(self, index, pnl)
+    Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     for x in range(int(pixel_x - settings.get_size() / 2 + 0.5), int(pixel_x + settings.get_size() / 2 + 0.5)):
@@ -120,10 +123,10 @@ class Brush(Tool):
     ctx.fill()
 
 class ColorPicker(Tool):
-  def __init__(self, index, pnl):
+  def __init__(self, index, parent):
     self.index = index
     self.button_path = "./assets/eye-dropper.png"
-    Tool.__init__(self, index, pnl)
+    Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     settings.set_color(canvas.get_pixel(pixel_x, pixel_y))
@@ -134,11 +137,11 @@ class ColorPicker(Tool):
     ctx.fill()
 
 class Eraser(Tool):
-  def __init__(self, index, pnl):
+  def __init__(self, index, parent):
     self.index = index
     self.button_path = "./assets/eraser.png"
     self.radius = 1
-    Tool.__init__(self, index, pnl)
+    Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     canvas.set_pixel(pixel_x, pixel_y, gdk.Color(0, 0, 0))
@@ -149,11 +152,11 @@ class Eraser(Tool):
     ctx.fill()
 
 class TilePlacer(Tool):
-  def __init__(self, index, pnl):
+  def __init__(self, index, parent):
     self.index = index
     self.button_path = "./assets/pencil.png"
     self.radius = 1
-    Tool.__init__(self, index, pnl)
+    Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
     canvas.place_tile(

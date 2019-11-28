@@ -72,6 +72,8 @@ class ToolSettings():
     dc.SetBrush(wx.Brush((0, 0, 0, 0)))
     dc.SetPen(wx.Pen((0, 0, 0, 255)))
     dc.DrawCircle(self.sat * width, self.val * width, width / 50)
+    dc.SetPen(wx.Pen((255, 255, 255, 255)))
+    dc.DrawCircle(self.sat * width, self.val * width, width / 50 + 1)
 
   def draw_hue(self, event):
     width = self.hue_gradient.GetSize().GetWidth()

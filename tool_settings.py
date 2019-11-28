@@ -95,6 +95,9 @@ class ToolSettings():
         wx.DOWN)
     dc.SetPen(wx.Pen((0, 0, 0, 255)))
     dc.DrawLine(0, self.hue * height, width, self.hue * height)
+    dc.SetPen(wx.Pen((255, 255, 255, 255)))
+    dc.DrawLine(0, self.hue * height - 1, width, self.hue * height - 1)
+    dc.DrawLine(0, self.hue * height + 1, width, self.hue * height + 1)
 
   def click(self, event):
     self.mouse_down = True
@@ -108,6 +111,9 @@ class ToolSettings():
       self.sat = event.GetX() / width
       self.val = event.GetY() / width
       self.color_gradient.Refresh()
+      self.hue_picker.refresh()
+      self.sat_picker.refresh()
+      self.val_picker.refresh()
 
   def move_hue(self, event):
     if self.mouse_down:
@@ -115,6 +121,9 @@ class ToolSettings():
       self.hue = event.GetY() / height
       self.hue_gradient.Refresh()
       self.color_gradient.Refresh()
+      self.hue_picker.refresh()
+      self.sat_picker.refresh()
+      self.val_picker.refresh()
 
   def open_color_menu(self):
     self.color_button.clicked()
@@ -166,6 +175,9 @@ class ColorPicker():
     width = self.gradient.GetSize().GetWidth()
     self.gradient.SetSize((width, width * 2))
 
+  def refresh(self):
+    self.gradient.Refresh()
+
   def draw(self, event):
     width = self.gradient.GetSize().GetWidth()
     height = self.gradient.GetSize().GetHeight()
@@ -178,7 +190,10 @@ class ColorPicker():
       new_hue = hue + self.hue_offset * (i - 2)
       new_sat = sat + self.sat_offset * (i - 2)
       new_val = val + self.val_offset * (i - 2)
-      new_hue = max(min(new_hue, 1), 0)
+      if new_hue > 1:
+        new_hue -= 1
+      if new_hue < 0:
+        new_hue += 1
       new_sat = max(min(new_sat, 1), 0)
       new_val = max(min(new_val, 1), 0)
       color = get_color(new_hue, new_sat, new_val)

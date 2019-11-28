@@ -27,23 +27,15 @@ class Tileset():
     self.delete_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/eraser.png"))
     self.buttons_sizer.Add(self.delete_button, 0, wx.ALL, 5)
 
-    # self.da = gtk.DrawingArea() # will draw tiles in here
-    # self.da.connect("draw", self.draw)
-    # self.da.set_vexpand(True)
-    # self.da.set_hexpand(True)
-    # self.event_box = gtk.EventBox()
-    # self.event_box.connect("button-press-event", self.click)
-    # self.event_box.add_events(gdk.EventMask.BUTTON_PRESS_MASK)
-    # self.event_box.add(self.da)
+    self.da = wx.Panel(self.box) # will draw tiles in here
+    sizer.Add(self.da, 1, wx.EXPAND, 5)
+    self.da.Bind(wx.EVT_PAINT, self.draw)
+    self.da.Bind(wx.EVT_LEFT_DOWN, self.click)
 
-    # self.box.pack_start(self.buttons_box, False, False, 0)
-    # self.box.pack_start(self.event_box, True, True, 0)
-    # self.box.show()
+    self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
+    self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
 
-    # self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
-    # self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
-
-    # self.add(None)
+    self.add(None)
 
   def widget(self):
     return self.box
@@ -69,7 +61,7 @@ class Tileset():
 
   def add(self, event):
     self.tiles.append(Tile(self.tile_width, self.tile_height, len(self.tiles)))
-    self.da.queue_draw()
+    self.da.Refresh()
 
   def get(self, tile_id):
     return self.tiles[tile_id]
@@ -96,7 +88,9 @@ class Tileset():
     self.selected_tile_id = index
     self.da.queue_draw()
 
-  def draw(self, widget, ctx):
+  def draw(self, event):
+    dc = wx.PaintDC(self.da)
+    ctx = wx.lib.wxcairo.ContextFromDC(dc)
     i = 0
     for tile in self.tiles:
       tile.draw(ctx, self.pixel_size, (i % self.tiles_per_row * 9 / 8, int(i / self.tiles_per_row) * 9 / 8))
@@ -125,14 +119,6 @@ class Tile():
     self.img = Image.new('RGB', (width, height), 'black')
     self.img.putalpha(256)
     self.pixels = self.img.load()
-    self.button = gtk.ToggleButton(relief=gtk.ReliefStyle.NORMAL)
-    self.button.set_size_request(32, 32 * 1.35)
-    self.button.index = index
-    self.button_drawing_area = gtk.DrawingArea()
-    self.button_drawing_area.connect("draw", self.draw_button)
-    self.button_drawing_area.show()
-    self.button.add(self.button_drawing_area)
-    self.button.show()
     self.update_pattern()
 
   def update_button(self):
@@ -174,10 +160,10 @@ class Tile():
 
   def get_pixel(self, x, y):
     r, g, b, a = self.pixels[x, y]
-    return gdk.Color(r * 256, g * 256, b * 256)
+    return (r * 256, g * 256, b * 256)
 
   def set_pixel(self, x, y, color):
-    self.pixels[x, y] = (int(color.red / 256), int(color.green / 256), int(color.blue / 256))
+    self.pixels[x, y] = tuple([int(i) for i in color])
     self.update_pattern()
 
   def draw(self, ctx, pixel_size, tile_pos):

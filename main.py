@@ -53,5 +53,5 @@ if __name__ == '__main__':
   frm = TilemapFrame()
   frm.Show()
   # enable debugging \/
-  wx.lib.inspection.InspectionTool().Show()
+  # wx.lib.inspection.InspectionTool().Show()
   app.MainLoop()

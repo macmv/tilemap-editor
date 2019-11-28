@@ -9,7 +9,7 @@ class ToolSettings():
 
     self.size_slider = wx.Slider(self.box, value=1, minValue=1, maxValue=10)
 
-    self.color_gradient = wx.Panel(self.box)
+    self.color_gradient = FixedPanel(self.box, 1, 1)
     self.color_gradient.Bind(wx.EVT_PAINT, self.draw_sat)
     self.color_gradient.Bind(wx.EVT_SIZE, self.size_sat)
     self.color_gradient.Bind(wx.EVT_LEFT_DOWN, self.click)
@@ -18,16 +18,33 @@ class ToolSettings():
 
     self.hue_gradient = wx.Panel(self.box)
     self.hue_gradient.Bind(wx.EVT_PAINT, self.draw_hue)
-    self.hue_gradient.Bind(wx.EVT_SIZE, self.size_hue)
     self.hue_gradient.Bind(wx.EVT_LEFT_DOWN, self.click)
     self.hue_gradient.Bind(wx.EVT_LEFT_UP, self.release)
     self.hue_gradient.Bind(wx.EVT_MOTION, self.move_hue)
 
-    sizer.Add(self.size_slider,    pos=(0, 0), span=(1, 2), flag=wx.EXPAND|wx.ALL, border=5)
-    sizer.Add(self.color_gradient, pos=(1, 0), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
-    sizer.Add(self.hue_gradient,   pos=(1, 1), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    column_sizer = wx.GridBagSizer()
+    self.column_box = wx.Panel(self.box) # for hue, sat, value, and current color columns
+    self.column_box.SetSizer(column_sizer)
+
+    self.hue_picker = HuePicker(self)
+    self.sat_picker = SatPicker(self)
+    self.val_picker = ValPicker(self)
+
+    sizer.Add(self.size_slider,                pos=(0, 0), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.Add(self.color_gradient,             pos=(1, 0), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.Add(self.hue_gradient,               pos=(1, 1), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.Add(self.column_box,                 pos=(2, 0), span=(1, 2), flag=wx.EXPAND|wx.ALL, border=5)
+    column_sizer.Add(self.hue_picker.widget(), pos=(0, 0), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    column_sizer.Add(self.sat_picker.widget(), pos=(0, 1), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    column_sizer.Add(self.val_picker.widget(), pos=(0, 2), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
 
     sizer.AddGrowableCol(0)
+    sizer.AddGrowableCol(1)
+    sizer.AddGrowableRow(2)
+    column_sizer.AddGrowableRow(0)
+    column_sizer.AddGrowableCol(0)
+    column_sizer.AddGrowableCol(1)
+    column_sizer.AddGrowableCol(2)
 
     self.hue = 0 # 0 - 1
     self.sat = 1 # 0 - 1
@@ -35,13 +52,12 @@ class ToolSettings():
 
     self.mouse_down = False
 
-  def size_sat(self, event):
-    width = self.color_gradient.GetSize().GetWidth()
-    self.color_gradient.SetSize((width, width))
+    self.size_sat_count = 0
 
-  def size_hue(self, event):
-    width = self.color_gradient.GetSize().GetWidth()
-    self.hue_gradient.SetSize((width / 8, width))
+  def size_sat(self, event):
+    if self.size_sat_count < 5:
+      self.color_gradient.InvalidateBestSize()
+      self.size_sat_count += 1
 
   def draw_sat(self, event):
     width = self.color_gradient.GetSize().GetWidth()
@@ -124,3 +140,93 @@ def get_color(hue, sat, val):
 
 def create(pnl):
   return ToolSettings(pnl)
+
+class FixedPanel(wx.Panel):
+  def __init__(self, parent, wratio, hratio):
+    wx.Panel.__init__(self, parent)
+    self.wratio = wratio
+    self.hratio = hratio
+
+  def DoGetBestSize(self):
+    width = self.GetSize().GetWidth()
+    return (width * self.wratio, width * self.hratio)
+
+class Picker():
+  def __init__(self, settings):
+    self.parent = settings
+    self.gradient = FixedPanel(settings.column_box, 1, 1)
+    self.gradient.Bind(wx.EVT_PAINT, self.draw)
+    self.gradient.Bind(wx.EVT_SIZE, self.size)
+
+  def size(self, event):
+    width = self.gradient.GetSize().GetWidth()
+    self.gradient.SetSize((width, width * 2))
+
+  def draw(self, event):
+    pass
+
+  def widget(self):
+    return self.gradient
+
+class HuePicker(Picker):
+  def draw(self, event):
+    width = self.gradient.GetSize().GetWidth()
+    height = self.gradient.GetSize().GetHeight()
+    dc = wx.PaintDC(self.gradient)
+    color = self.parent.get_color()
+    hue = self.parent.hue
+    sat = self.parent.sat
+    val = self.parent.val
+    hue_offset = 0.1
+    sat_offset = 0
+    val_offset = 0
+    colors = []
+    for i in range(5):
+      colors[i] = get_color(hue + hue_offset, sat + sat_offset, val + val_offset)
+    for i in range(5):
+      dc.GradientFillLinear(
+          wx.Rect(0, height * i / 5, width, height / 5),
+          colors[i],
+          colors[i],
+          wx.DOWN)
+
+class SatPicker(Picker):
+  def draw(self, event):
+    width = self.gradient.GetSize().GetWidth()
+    height = self.gradient.GetSize().GetHeight()
+    dc = wx.PaintDC(self.gradient)
+    colors = [(255, 255, 255), (0, 255, 0), (0, 0, 255)]
+    dc.GradientFillLinear(
+        wx.Rect(0, height * 1 / 3, width, height / 3),
+        colors[1],
+        colors[2],
+        wx.DOWN)
+    dc.GradientFillLinear(
+        wx.Rect(0, height * 2 / 3, width, height / 3),
+        colors[2],
+        colors[0],
+        wx.DOWN)
+    dc.SetPen(wx.Pen((0, 0, 0, 255)))
+
+class ValPicker(Picker):
+  def draw(self, event):
+    width = self.gradient.GetSize().GetWidth()
+    height = self.gradient.GetSize().GetHeight()
+    dc = wx.PaintDC(self.gradient)
+    colors = [(255, 255, 255), (0, 255, 0), (0, 0, 255)]
+    dc.GradientFillLinear(
+        wx.Rect(0, height * 0 / 3, width, height / 3),
+        colors[0],
+        colors[1],
+        wx.DOWN)
+    dc.GradientFillLinear(
+        wx.Rect(0, height * 1 / 3, width, height / 3),
+        colors[1],
+        colors[2],
+        wx.DOWN)
+    dc.GradientFillLinear(
+        wx.Rect(0, height * 2 / 3, width, height / 3),
+        colors[2],
+        colors[0],
+        wx.DOWN)
+    dc.SetPen(wx.Pen((0, 0, 0, 255)))

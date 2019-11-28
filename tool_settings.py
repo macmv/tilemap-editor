@@ -110,20 +110,20 @@ class ToolSettings():
       width = self.color_gradient.GetSize().GetWidth()
       self.sat = event.GetX() / width
       self.val = event.GetY() / width
-      self.color_gradient.Refresh()
-      self.hue_picker.refresh()
-      self.sat_picker.refresh()
-      self.val_picker.refresh()
+      self.refresh()
 
   def move_hue(self, event):
     if self.mouse_down:
       height = self.hue_gradient.GetSize().GetHeight()
       self.hue = event.GetY() / height
-      self.hue_gradient.Refresh()
-      self.color_gradient.Refresh()
-      self.hue_picker.refresh()
-      self.sat_picker.refresh()
-      self.val_picker.refresh()
+      self.refresh()
+
+  def refresh(self):
+    self.hue_gradient.Refresh()
+    self.color_gradient.Refresh()
+    self.hue_picker.refresh()
+    self.sat_picker.refresh()
+    self.val_picker.refresh()
 
   def open_color_menu(self):
     self.color_button.clicked()
@@ -166,10 +166,15 @@ class ColorPicker():
     self.gradient = FixedPanel(settings.column_box, 1, 1)
     self.gradient.Bind(wx.EVT_PAINT, self.draw)
     self.gradient.Bind(wx.EVT_SIZE, self.size)
+    self.gradient.Bind(wx.EVT_LEFT_DOWN, self.click)
+    self.gradient.Bind(wx.EVT_LEFT_UP, self.release)
+    self.gradient.Bind(wx.EVT_MOTION, self.move)
     self.selected = 0
     self.hue_offset = hue_offset
     self.sat_offset = sat_offset
     self.val_offset = val_offset
+    self.offset_amount = 0
+    self.mouse_down = False
 
   def size(self, event):
     width = self.gradient.GetSize().GetWidth()
@@ -177,6 +182,42 @@ class ColorPicker():
 
   def refresh(self):
     self.gradient.Refresh()
+
+  def click(self, event):
+    self.mouse_down = True
+    self.get_offset(event.GetX(), event.GetY())
+    self.refresh()
+
+  def release(self, event):
+    self.mouse_down = False
+    self.get_offset(event.GetX(), event.GetY())
+    hue = self.parent.hue
+    sat = self.parent.sat
+    val = self.parent.val
+    new_hue = hue + self.hue_offset * (self.offset_amount)
+    new_sat = sat + self.sat_offset * (self.offset_amount)
+    new_val = val + self.val_offset * (self.offset_amount)
+    if new_hue > 1:
+      new_hue -= 1
+    if new_hue < 0:
+      new_hue += 1
+    new_sat = max(min(new_sat, 1), 0)
+    new_val = max(min(new_val, 1), 0)
+    self.parent.hue = new_hue
+    self.parent.sat = new_sat
+    self.parent.val = new_val
+    self.parent.refresh()
+    self.offset_amount = 0
+    self.refresh()
+
+  def move(self, event):
+    if self.mouse_down:
+      self.get_offset(event.GetX(), event.GetY())
+      self.refresh()
+
+  def get_offset(self, x, y):
+    percent = y / self.gradient.GetSize().GetHeight()
+    self.offset_amount = int(percent * 5) - 2
 
   def draw(self, event):
     width = self.gradient.GetSize().GetWidth()
@@ -197,7 +238,7 @@ class ColorPicker():
       new_sat = max(min(new_sat, 1), 0)
       new_val = max(min(new_val, 1), 0)
       color = get_color(new_hue, new_sat, new_val)
-      if i == 2:
+      if i - 2 == self.offset_amount:
         dc.SetPen(wx.Pen((255, 255, 255)))
       else:
         dc.SetPen(wx.Pen(color))

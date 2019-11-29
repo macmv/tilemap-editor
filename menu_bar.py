@@ -13,13 +13,53 @@ class MenuBar():
   def widget(self):
     return self.mb
 
+  # is the file tab in the menu
   def create_file(self):
     menu = wx.Menu()
-    menu.Append(wx.ID_NEW, "New File", "Creates a new file", wx.ITEM_NORMAL)
+
+    new = wx.MenuItem(menu, wx.ID_NEW, "New")
+    menu.Bind(wx.EVT_MENU, self.new_file, new)
+    menu.Append(new)
+
+    open_ = wx.MenuItem(menu, wx.ID_OPEN, "Open")
+    menu.Bind(wx.EVT_MENU, self.open_file, open_)
+    menu.Append(open_)
+
+    save = wx.MenuItem(menu, wx.ID_SAVE, "Save")
+    menu.Bind(wx.EVT_MENU, self.save_file, save)
+    menu.Append(save)
+
+    saveas = wx.MenuItem(menu, wx.ID_SAVEAS, "Save As")
+    menu.Bind(wx.EVT_MENU, self.save_as, saveas)
+    menu.Append(saveas)
 
     return menu
 
-  def new_canvas(self, widget):
+  # is the edit tab in the menu
+  def create_edit(self):
+    menu = gtk.Menu()
+    copy = gtk.ImageMenuItem(gtk.STOCK_COPY)
+    menu.append(copy)
+    cut = gtk.ImageMenuItem(gtk.STOCK_CUT)
+    menu.append(cut)
+    paste = gtk.ImageMenuItem(gtk.STOCK_PASTE)
+    menu.append(paste)
+
+    tab = gtk.MenuItem("Edit")
+    tab.set_submenu(menu)
+    return tab
+
+  # is the tools tab in the menu
+  def create_tools(self):
+    menu = gtk.Menu()
+    copy = gtk.ImageMenuItem(gtk.STOCK_COPY)
+    menu.append(copy)
+
+    tab = gtk.MenuItem("Tools")
+    tab.set_submenu(menu)
+    return tab
+
+  def new_file(self, event):
     dialog = NewDialog(self.window)
     r = dialog.run()
     dialog.close()
@@ -61,27 +101,8 @@ class MenuBar():
         filename = filename + ".map"
       self.canvas_manager.save(filename)
 
-  def create_edit(self):
-    menu = gtk.Menu()
-    copy = gtk.ImageMenuItem(gtk.STOCK_COPY)
-    menu.append(copy)
-    cut = gtk.ImageMenuItem(gtk.STOCK_CUT)
-    menu.append(cut)
-    paste = gtk.ImageMenuItem(gtk.STOCK_PASTE)
-    menu.append(paste)
-
-    tab = gtk.MenuItem("Edit")
-    tab.set_submenu(menu)
-    return tab
-
-  def create_tools(self):
-    menu = gtk.Menu()
-    copy = gtk.ImageMenuItem(gtk.STOCK_COPY)
-    menu.append(copy)
-
-    tab = gtk.MenuItem("Tools")
-    tab.set_submenu(menu)
-    return tab
+  def save_as(self, event):
+    pass
 
 class NewDialog:
   def __init__(self, parent):

@@ -30,6 +30,9 @@ class TilemapFrame(wx.Frame):
     self.sizer.AddGrowableCol(1)
     self.sizer.AddGrowableRow(1)
 
+    canvas_manager.new(None)
+    canvas_manager.new(None)
+
   def create_tileset(self):
     tileset = tileset_module.create(self.pnl, 16, 16)
     return tileset
@@ -38,7 +41,15 @@ class TilemapFrame(wx.Frame):
     self.Close(True)
 
   def update_tileset(self, tileset):
-    self.sizer.Add(tileset.widget(), pos=(0, 2), span=(2, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    old_tileset = self.sizer.FindItemAtPosition((0, 2))
+    new_tileset = tileset.widget()
+    if old_tileset != None:
+      old_tileset.Show(False)
+      # 3 is the index where we put tilesets. If we add something before, this needs to change
+      self.sizer.Detach(3)
+    new_tileset.Show(True)
+    self.sizer.Add(new_tileset, pos=(0, 2), span=(2, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    self.pnl.Layout()
 
 if __name__ == '__main__':
   # When this module is run (not imported) then create the app, the

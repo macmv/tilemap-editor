@@ -12,8 +12,9 @@ class CanvasManager:
     box_sizer = wx.BoxSizer(wx.VERTICAL)
     self.box.SetSizer(box_sizer)
 
-    self.tab_sizer = wx.BoxSizer()
+    self.tab_sizer = wx.BoxSizer(wx.HORIZONTAL)
     self.tab_switcher = wx.Panel(self.box)
+    self.tab_switcher.SetSizer(self.tab_sizer)
     box_sizer.Add(self.tab_switcher, 0, wx.ALL, 5)
 
     self.toolbar = toolbar
@@ -30,8 +31,6 @@ class CanvasManager:
     self.da.Bind(wx.EVT_MOUSEWHEEL, self.scroll)
     self.da.Bind(wx.EVT_MOTION, self.move)
     window.Bind(wx.EVT_CHAR_HOOK, self.key_press)
-
-    self.new(None)
 
   def draw(self, event):
     dc = wx.PaintDC(self.da)
@@ -89,12 +88,14 @@ class CanvasManager:
     button = wx.Button(self.tab_switcher)
     button.Bind(wx.EVT_BUTTON, self.set_canvas)
     button.id = len(self.canvases) - 1
-    self.tab_sizer.Add(button, False, False, 0)
+    self.tab_sizer.Add(button, 0, wx.EXPAND|wx.ALL, 5)
+    self.tab_switcher.Layout()
 
   def set_canvas(self, event):
     widget = event.GetEventObject()
     self.current_canvas = widget.id
     canvas = self.canvases[self.current_canvas]
+    self.toolbar.set_tileset(canvas.tileset)
     self.window.update_tileset(canvas.tileset)
 
 def create(pnl, window, toolbar):

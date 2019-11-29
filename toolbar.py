@@ -31,7 +31,6 @@ class Toolbar():
 
   def key_press(self, event):
     key = chr(event.GetUnicodeKey())
-    print(key)
     # need to use keyval because control, shift, etc.
     if key == 'B':
       self.set_tool(1)
@@ -39,8 +38,6 @@ class Toolbar():
       self.set_tool(2)
     if key == 'V':
       self.set_tool(3)
-    if key == 'C':
-      self.tool_settings.open_color_menu()
     if key == 'N':
       self.tileset.add(None)
     if ord(key) >= 48 and ord(key) <= 58: # if you pressed any number
@@ -129,7 +126,9 @@ class ColorPicker(Tool):
     Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
-    settings.set_color(canvas.get_pixel(pixel_x, pixel_y))
+    color = canvas.get_pixel(pixel_x, pixel_y)
+    if color != None:
+      settings.set_color(color)
 
   def draw_cursor(self, ctx, cursor_x, cursor_y, size, canvas):
     ctx.set_source_rgba(0.4, 0.4, 1, 1)
@@ -159,7 +158,6 @@ class TilePlacer(Tool):
     Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
-    print(canvas.get_tileset())
     canvas.place_tile(
         int(pixel_x / canvas.get_tileset().get_tile_width()),
         int(pixel_y / canvas.get_tileset().get_tile_height()),

@@ -93,7 +93,6 @@ class CanvasManager:
 
   def set_canvas(self, event):
     widget = event.GetEventObject()
-    print(widget.id)
     self.current_canvas = widget.id
     canvas = self.canvases[self.current_canvas]
     self.window.update_tileset(canvas.tileset)

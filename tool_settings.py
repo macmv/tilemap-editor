@@ -127,9 +127,6 @@ class ToolSettings():
     self.sat_picker.refresh()
     self.val_picker.refresh()
 
-  def open_color_menu(self):
-    self.color_button.clicked()
-
   def set_size(self, value):
     self.size_slider.set_value(value)
 

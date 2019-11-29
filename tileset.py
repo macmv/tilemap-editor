@@ -153,7 +153,7 @@ class Tile():
 
   def get_pixel(self, x, y):
     r, g, b, a = self.pixels[x, y]
-    return (r * 256, g * 256, b * 256)
+    return (r, g, b)
 
   def set_pixel(self, x, y, color):
     self.pixels[x, y] = tuple([int(i) for i in color])

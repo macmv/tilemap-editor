@@ -23,6 +23,8 @@ class Canvas():
     self.fm = file_manager.FileManager(self)
 
   def place_tile(self, x, y, id):
+    if id < 0:
+      return
     if x < self.width and x >= 0 and y < self.height and y >= 0:
       self.tilemap[(x, y)] = id
 

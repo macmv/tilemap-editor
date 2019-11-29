@@ -12,30 +12,27 @@ class Tileset():
     self.tiles = [] # array of Tile objects
     self.selected_tile_id = -1 # index of tile selected in gui
 
-    sizer = wx.BoxSizer(wx.VERTICAL)
+    sizer = wx.GridBagSizer()
     self.box = wx.Panel(pnl) # main container for everything
     self.box.SetSizer(sizer)
 
-    self.buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
-    self.buttons_box = wx.Panel(self.box) # container for add / delete buttons
-    sizer.Add(self.buttons_box, 0, wx.ALL, 5)
-    self.buttons_box.SetSizer(self.buttons_sizer)
-
-    self.new_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/pencil.png"))
-    self.buttons_sizer.Add(self.new_button, 0, wx.ALL, 5)
+    self.new_button = wx.BitmapButton(self.box, bitmap=wx.Bitmap("assets/pencil.png"))
     self.new_button.Bind(wx.EVT_BUTTON, self.add)
 
-    self.delete_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/eraser.png"))
-    self.buttons_sizer.Add(self.delete_button, 0, wx.ALL, 5)
+    self.delete_button = wx.BitmapButton(self.box, bitmap=wx.Bitmap("assets/eraser.png"))
     self.delete_button.Bind(wx.EVT_BUTTON, self.remove_selected)
 
     self.da = wx.Panel(self.box) # will draw tiles in here
-    sizer.Add(self.da, 1, wx.EXPAND, 5)
     self.da.Bind(wx.EVT_PAINT, self.draw)
     self.da.Bind(wx.EVT_LEFT_DOWN, self.click)
 
+    sizer.Add(self.new_button,    pos=(0, 0), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.Add(self.delete_button, pos=(0, 1), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.Add(self.da,            pos=(1, 0), span=(1, 2), flag=wx.EXPAND|wx.ALL, border=5)
+    sizer.AddGrowableRow(1)
+
     self.pixel_size = 4 # this should be the width of the tileset / tiles_per_row / tile_width
-    self.tiles_per_row = 2 # this should be defined based on how big we want the tiles to be
+    self.tiles_per_row = 4 # this should be defined based on how big we want the tiles to be
 
     self.add(None)
 

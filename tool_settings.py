@@ -62,7 +62,7 @@ class ToolSettings():
   def draw_sat(self, event):
     width = self.color_gradient.GetSize().GetWidth()
     dc = wx.PaintDC(self.color_gradient)
-    color = get_color(self.hue, 1, 1)
+    color = get_rgb(self.hue, 1, 1)
     for i in range(width):
       ratio = i / width
       dc.GradientFillLinear(
@@ -134,10 +134,11 @@ class ToolSettings():
     self.size_slider.set_value(value)
 
   def set_color(self, color):
-    self.color_button.set_color(color)
+    self.hue, self.sat, self.val = get_hsv(color)
+    self.refresh()
 
   def get_color(self):
-    return get_color(self.hue, self.sat, self.val)
+    return get_rgb(self.hue, self.sat, self.val)
 
   def get_size(self):
     return self.size_slider.GetValue()
@@ -145,9 +146,13 @@ class ToolSettings():
   def widget(self):
     return self.box
 
-def get_color(hue, sat, val):
+def get_rgb(hue, sat, val):
   color = colorsys.hsv_to_rgb(hue, sat, val)
   return tuple([255 * i for i in color])
+
+def get_hsv(color):
+  color = colorsys.rgb_to_hsv(*[i / 255 for i in color])
+  return color
 
 def create(pnl):
   return ToolSettings(pnl)
@@ -239,7 +244,7 @@ class ColorPicker():
         new_hue += 1
       new_sat = max(min(new_sat, 1), 0)
       new_val = max(min(new_val, 1), 0)
-      color = get_color(new_hue, new_sat, new_val)
+      color = get_rgb(new_hue, new_sat, new_val)
       if i - 2 == self.offset_amount:
         dc.SetPen(wx.Pen((255, 255, 255)))
       else:

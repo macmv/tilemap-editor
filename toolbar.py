@@ -159,6 +159,7 @@ class TilePlacer(Tool):
     Tool.__init__(self, index, parent)
 
   def use(self, canvas, pixel_x, pixel_y, settings):
+    print(canvas.get_tileset())
     canvas.place_tile(
         int(pixel_x / canvas.get_tileset().get_tile_width()),
         int(pixel_y / canvas.get_tileset().get_tile_height()),

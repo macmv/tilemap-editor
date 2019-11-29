@@ -23,9 +23,11 @@ class Tileset():
 
     self.new_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/pencil.png"))
     self.buttons_sizer.Add(self.new_button, 0, wx.ALL, 5)
+    self.new_button.Bind(wx.EVT_BUTTON, self.add)
 
     self.delete_button = wx.BitmapButton(self.buttons_box, bitmap=wx.Bitmap("assets/eraser.png"))
     self.buttons_sizer.Add(self.delete_button, 0, wx.ALL, 5)
+    self.delete_button.Bind(wx.EVT_BUTTON, self.remove_selected)
 
     self.da = wx.Panel(self.box) # will draw tiles in here
     sizer.Add(self.da, 1, wx.EXPAND, 5)
@@ -41,8 +43,7 @@ class Tileset():
     return self.box
 
   def update(self):
-    pass
-    # self.da.queue_draw()
+    self.da.Refresh()
 
   def load_tileset(self, width, height, tileset):
     self.tile_width = width
@@ -70,15 +71,14 @@ class Tileset():
     if self.selected_tile_id == -1:
       return
     tile = self.tiles[self.selected_tile_id]
-    tile.destroy()
     del self.tiles[self.selected_tile_id]
     if self.selected_tile_id >= len(self.tiles):
       self.selected_tile_id = -1
-    self.da.queue_draw()
+    self.da.Refresh()
 
-  def click(self, widget, event):
-    tile_x = int(event.x / self.tile_width / self.pixel_size)
-    tile_y = int(event.y / self.tile_height / self.pixel_size)
+  def click(self, event):
+    tile_x = int(event.GetX() / self.tile_width / self.pixel_size)
+    tile_y = int(event.GetY() / self.tile_height / self.pixel_size)
     index = tile_y * self.tiles_per_row + tile_x
     self.select(index)
 
@@ -86,7 +86,7 @@ class Tileset():
     if index >= len(self.tiles):
       index = -1
     self.selected_tile_id = index
-    self.da.queue_draw()
+    self.da.Refresh()
 
   def draw(self, event):
     dc = wx.PaintDC(self.da)
@@ -120,13 +120,6 @@ class Tile():
     self.img.putalpha(256)
     self.pixels = self.img.load()
     self.update_pattern()
-
-  def update_button(self):
-    self.button_drawing_area.queue_draw()
-
-  def destroy(self):
-    self.button.destroy()
-    self.button_drawing_area.destroy()
 
   def draw_button(self, widget, ctx):
     mat = cairo.Matrix() # to get rid of the translation on the pattern when drawing on the canvas

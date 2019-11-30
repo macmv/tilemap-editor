@@ -9,8 +9,8 @@ class MenuBar():
 
     self.mb = wx.MenuBar()
     self.mb.Append(self.create_file(), "File")
-    # self.mb.Append(self.create_edit())
-    # self.mb.Append(self.create_tools())
+    self.mb.Append(self.create_edit(), "Edit")
+    # self.mb.Append(self.create_tools(), "Tools")
 
   def widget(self):
     return self.mb
@@ -39,17 +39,21 @@ class MenuBar():
 
   # is the edit tab in the menu
   def create_edit(self):
-    menu = gtk.Menu()
-    copy = gtk.ImageMenuItem(gtk.STOCK_COPY)
-    menu.append(copy)
-    cut = gtk.ImageMenuItem(gtk.STOCK_CUT)
-    menu.append(cut)
-    paste = gtk.ImageMenuItem(gtk.STOCK_PASTE)
-    menu.append(paste)
+    menu = wx.Menu()
 
-    tab = gtk.MenuItem("Edit")
-    tab.set_submenu(menu)
-    return tab
+    copy = wx.MenuItem(menu, wx.ID_COPY, "Copy")
+    # menu.Bind(wx.EVT_MENU, self.copy, cyop)
+    menu.Append(copy)
+
+    cut = wx.MenuItem(menu, wx.ID_CUT, "Cut")
+    # menu.Bind(wx.EVT_MENU, self.cut, cut)
+    menu.Append(cut)
+
+    paste = wx.MenuItem(menu, wx.ID_PASTE, "Paste")
+    # menu.Bind(wx.EVT_MENU, self.paste, paste)
+    menu.Append(paste)
+
+    return menu
 
   # is the tools tab in the menu
   def create_tools(self):
@@ -72,20 +76,14 @@ class MenuBar():
       self.canvas_manager.new(width, height, tile_width, tile_height)
 
   def open_file(self, widget):
-    dialog = gtk.FileChooserDialog("Choose a file", None,
-      gtk.FileChooserAction.OPEN,
-      (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
-       gtk.STOCK_OPEN, gtk.ResponseType.OK))
-    filter_text = gtk.FileFilter()
-    filter_text.set_name("Map files")
-    filter_text.add_pattern("*.map")
-    dialog.add_filter(filter_text)
-
-    response = dialog.run()
-    dialog.close()
-
-    if response == gtk.ResponseType.OK:
-      self.canvas_manager.open(dialog.get_filename())
+    dialog = wx.FileDialog(self.window,
+        "Choose a file to edit",
+        wildcard="Map Files (*.map)|*.map",
+        style=wx.FD_OPEN)
+    status = dialog.ShowModal()
+    if status == wx.ID_OK:
+      filename = dialog.GetFilename()
+      self.canvas_manager.open(filename)
 
   def save_file(self, widget):
     dialog = gtk.FileChooserDialog("Please choose where to save", None,

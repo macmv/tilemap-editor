@@ -19,7 +19,6 @@ class Toolbar():
     i = 0
     for tool in self.tools:
       button = tool.widget()
-      # button.connect("clicked", self.click)
       sizer.Add(button, pos=(int(i / 2), i % 2), span=(1, 1), flag=wx.EXPAND|wx.ALL, border=5)
       i += 1
     sizer.AddGrowableCol(0)
@@ -87,7 +86,7 @@ def create(pnl, tileset, tool_settings):
 
 class Tool():
   def __init__(self, index, parent):
-    self.button = wx.ToggleButton(parent.box)
+    self.button = wx.BitmapToggleButton(parent.box, label=wx.Bitmap(self.button_path))
     self.button.index = index
     self.button.Bind(wx.EVT_TOGGLEBUTTON, parent.click)
 

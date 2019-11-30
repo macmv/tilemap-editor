@@ -1,11 +1,11 @@
 
 syntax = "proto3";
 
-message Tilemap { // map of position to tile id
-  map<int64, int64> tiles = 1; // key = y * width + x, or x = index % width, y = int(index / width)
-  int64 tile_width = 2; // in pixels
-  int64 tile_height = 3; // ^
-  int64 width = 4; // in tiles
-  int64 height = 5; // ^
-  repeated bytes tileset = 6; // aray of tiles keyed by id, value is image
+message Tilemap {               // entire tilemap
+  map<int64, int64> tiles = 1;  // key = y * width + x, value is tile id
+  int64 tile_width = 2;         // width of tile in pixels
+  int64 tile_height = 3;        // height of tile in pixels
+  int64 width = 4;              // width of map in tiles
+  int64 height = 5;             // height of map in tiles
+  repeated bytes tileset = 6;   // aray of tiles keyed by id, value is compressed png image
 }

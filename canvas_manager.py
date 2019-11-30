@@ -88,8 +88,8 @@ class CanvasManager:
     button = wx.Button(self.tab_switcher)
     button.Bind(wx.EVT_BUTTON, self.set_canvas)
     button.id = len(self.canvases) - 1
-    self.tab_sizer.Add(button, 0, wx.EXPAND|wx.ALL, 5)
-    self.tab_switcher.Layout()
+    self.tab_sizer.Add(button, 1, wx.EXPAND|wx.ALL, 5)
+    self.box.Layout()
 
   def set_canvas(self, event):
     widget = event.GetEventObject()

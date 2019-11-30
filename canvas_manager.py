@@ -68,8 +68,12 @@ class CanvasManager:
     return self.box
 
   def open(self, filename):
+    # 1, 1 is a placeholder. Overwritten by load_from_file
+    tileset = self.window.create_tileset(1, 1)
+    self.toolbar.set_tileset(tileset)
     canvas = canvas_module.load_from_file(filename, self.window, self.toolbar)
     self.canvases.append(canvas)
+    self.window.update_tileset(tileset)
     self.add_tab()
 
   def save(self, filename):

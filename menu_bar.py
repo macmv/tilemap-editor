@@ -65,7 +65,11 @@ class MenuBar():
     dialog = NewDialog(self.window)
     status = dialog.ShowModal()
     if status == wx.ID_OK:
-      self.canvas_manager.new(dialog)
+      width = dialog.get_width()
+      height = dialog.get_height()
+      tile_width = dialog.get_tile_width()
+      tile_height = dialog.get_tile_height()
+      self.canvas_manager.new(width, height, tile_width, tile_height)
 
   def open_file(self, widget):
     dialog = gtk.FileChooserDialog("Choose a file", None,
@@ -113,31 +117,52 @@ class NewDialog(wx.Dialog):
     pnl = wx.Panel(self)
     pnl.SetSizer(sizer)
 
-    width_text        = wx.StaticText(pnl, label="Map Width:")
-    width_entry       = wx.SpinCtrl(pnl)
-    height_text       = wx.StaticText(pnl, label="Map Height:")
-    height_entry      = wx.SpinCtrl(pnl)
-    tile_width_text   = wx.StaticText(pnl, label="Tile Width:")
-    tile_width_entry  = wx.SpinCtrl(pnl)
-    tile_height_text  = wx.StaticText(pnl, label="Tile Height:")
-    tile_height_entry = wx.SpinCtrl(pnl)
-    cancel_button     = wx.Button(pnl, label="Cancel")
-    ok_button         = wx.Button(pnl, label="Ok")
+    width_text             = wx.StaticText(pnl, label="Map Width:")
+    height_text            = wx.StaticText(pnl, label="Map Height:")
+    tile_width_text        = wx.StaticText(pnl, label="Tile Width:")
+    tile_height_text       = wx.StaticText(pnl, label="Tile Height:")
+    self.width_entry       = wx.SpinCtrl(pnl, min=1, max=1024, initial=5)
+    self.height_entry      = wx.SpinCtrl(pnl, min=1, max=1024, initial=5)
+    self.tile_width_entry  = wx.SpinCtrl(pnl, min=4, max=256,  initial=16)
+    self.tile_height_entry = wx.SpinCtrl(pnl, min=4, max=256,  initial=16)
+    cancel_button          = wx.Button(pnl, label="Cancel")
+    ok_button              = wx.Button(pnl, label="Ok")
 
-    sizer.Add(width_text,        pos=(1, 0), span=(1, 1), flag=wx.ALL,                border=5)
-    sizer.Add(width_entry,       pos=(1, 1), span=(1, 2), flag=wx.ALL,                border=5)
-    sizer.Add(height_text,       pos=(2, 0), span=(1, 1), flag=wx.ALL,                border=5)
-    sizer.Add(height_entry,      pos=(2, 1), span=(1, 2), flag=wx.ALL,                border=5)
-    sizer.Add(tile_width_text,   pos=(3, 0), span=(1, 1), flag=wx.ALL,                border=5)
-    sizer.Add(tile_width_entry,  pos=(3, 1), span=(1, 2), flag=wx.ALL,                border=5)
-    sizer.Add(tile_height_text,  pos=(4, 0), span=(1, 1), flag=wx.ALL,                border=5)
-    sizer.Add(tile_height_entry, pos=(4, 1), span=(1, 2), flag=wx.ALL,                border=5)
-    sizer.Add(cancel_button,     pos=(5, 1), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
-    sizer.Add(ok_button,         pos=(5, 2), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
+    cancel_button.Bind(wx.EVT_BUTTON, self.cancel)
+    ok_button.Bind(wx.EVT_BUTTON, self.confirm)
+
+    sizer.Add(width_text,             pos=(1, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(self.width_entry,       pos=(1, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(height_text,            pos=(2, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(self.height_entry,      pos=(2, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(tile_width_text,        pos=(3, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(self.tile_width_entry,  pos=(3, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(tile_height_text,       pos=(4, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(self.tile_height_entry, pos=(4, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(cancel_button,          pos=(5, 1), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
+    sizer.Add(ok_button,              pos=(5, 2), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
 
     sizer.AddGrowableCol(0)
 
     self.SetInitialSize((500, 300))
+
+  def cancel(self, event):
+    self.EndModal(wx.ID_CANCEL)
+
+  def confirm(self, event):
+    self.EndModal(wx.ID_OK)
+
+  def get_width(self):
+    return self.width_entry.GetValue()
+
+  def get_height(self):
+    return self.height_entry.GetValue()
+
+  def get_tile_width(self):
+    return self.tile_width_entry.GetValue()
+
+  def get_tile_height(self):
+    return self.tile_height_entry.GetValue()
 
 def create(canvas, window):
   return MenuBar(canvas, window)

@@ -30,11 +30,10 @@ class TilemapFrame(wx.Frame):
     self.sizer.AddGrowableCol(1)
     self.sizer.AddGrowableRow(1)
 
-    canvas_manager.new(None)
-    canvas_manager.new(None)
+    canvas_manager.new(5, 5, 16, 16)
 
-  def create_tileset(self):
-    tileset = tileset_module.create(self.pnl, 16, 16)
+  def create_tileset(self, tile_width, tile_height):
+    tileset = tileset_module.create(self.pnl, tile_width, tile_height)
     return tileset
 
   def OnExit(self, event):

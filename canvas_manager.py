@@ -76,10 +76,10 @@ class CanvasManager:
     if self.canvases:
       self.canvases[self.current_canvas].save(filename)
 
-  def new(self, dialog):
-    tileset = self.window.create_tileset()
+  def new(self, width, height, tile_width, tile_height):
+    tileset = self.window.create_tileset(tile_width, tile_height)
     self.toolbar.set_tileset(tileset)
-    canvas = canvas_module.load_from_settings(5, 5, self.window, self.toolbar)
+    canvas = canvas_module.load_from_settings(width, height, self.window, self.toolbar)
     self.canvases.append(canvas)
     self.window.update_tileset(tileset)
     self.add_tab()

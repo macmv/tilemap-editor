@@ -2,8 +2,10 @@ import wx
 import file_manager
 
 class MenuBar():
-  def __init__(self, canvas_manager):
+  def __init__(self, canvas_manager, window):
     self.canvas_manager = canvas_manager
+
+    self.window = window
 
     self.mb = wx.MenuBar()
     self.mb.Append(self.create_file(), "File")
@@ -61,9 +63,8 @@ class MenuBar():
 
   def new_file(self, event):
     dialog = NewDialog(self.window)
-    r = dialog.run()
-    dialog.close()
-    if r == gtk.ResponseType.OK:
+    status = dialog.ShowModal()
+    if status == wx.ID_OK:
       self.canvas_manager.new(dialog)
 
   def open_file(self, widget):
@@ -104,41 +105,39 @@ class MenuBar():
   def save_as(self, event):
     pass
 
-class NewDialog:
+class NewDialog(wx.Dialog):
   def __init__(self, parent):
-    gtk.Dialog.__init__(self, "", parent, 0,
-        (gtk.STOCK_CANCEL, gtk.ResponseType.CANCEL,
-         gtk.STOCK_OK, gtk.ResponseType.OK))
+    super(NewDialog, self).__init__(parent, title="New File", style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER)
 
-    header = gtk.HeaderBar(title="New File")
-    header.props.show_close_button = True
-    self.set_titlebar(header)
+    sizer = wx.GridBagSizer()
+    pnl = wx.Panel(self)
+    pnl.SetSizer(sizer)
 
-    self.set_default_size(150, 100)
+    width_text        = wx.StaticText(pnl, label="Map Width:")
+    width_entry       = wx.SpinCtrl(pnl)
+    height_text       = wx.StaticText(pnl, label="Map Height:")
+    height_entry      = wx.SpinCtrl(pnl)
+    tile_width_text   = wx.StaticText(pnl, label="Tile Width:")
+    tile_width_entry  = wx.SpinCtrl(pnl)
+    tile_height_text  = wx.StaticText(pnl, label="Tile Height:")
+    tile_height_entry = wx.SpinCtrl(pnl)
+    cancel_button     = wx.Button(pnl, label="Cancel")
+    ok_button         = wx.Button(pnl, label="Ok")
 
-    box = self.get_content_area()
+    sizer.Add(width_text,        pos=(1, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(width_entry,       pos=(1, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(height_text,       pos=(2, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(height_entry,      pos=(2, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(tile_width_text,   pos=(3, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(tile_width_entry,  pos=(3, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(tile_height_text,  pos=(4, 0), span=(1, 1), flag=wx.ALL,                border=5)
+    sizer.Add(tile_height_entry, pos=(4, 1), span=(1, 2), flag=wx.ALL,                border=5)
+    sizer.Add(cancel_button,     pos=(5, 1), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
+    sizer.Add(ok_button,         pos=(5, 2), span=(1, 1), flag=wx.ALL|wx.ALIGN_RIGHT, border=5)
 
-    width_box = gtk.Box()
-    width_box.add(gtk.Label("Map Width:"))
-    width_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
-    box.add(width_box)
+    sizer.AddGrowableCol(0)
 
-    height_box = gtk.Box()
-    height_box.add(gtk.Label("Map Height:"))
-    height_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
-    box.add(height_box)
+    self.SetInitialSize((500, 300))
 
-    tile_width_box = gtk.Box()
-    tile_width_box.add(gtk.Label("Tile Width:"))
-    tile_width_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
-    box.add(tile_width_box)
-
-    tile_height_box = gtk.Box()
-    tile_height_box.add(gtk.Label("Tile Height:"))
-    tile_height_box.add(gtk.SpinButton(adjustment=gtk.Adjustment(0, 0, 9223372036854775807, 1)))
-    box.add(tile_height_box)
-
-    self.show_all()
-
-def create(canvas):
-  return MenuBar(canvas)
+def create(canvas, window):
+  return MenuBar(canvas, window)

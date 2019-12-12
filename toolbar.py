@@ -152,7 +152,7 @@ class Eraser(Tool):
 class TilePlacer(Tool):
   def __init__(self, index, parent):
     self.index = index
-    self.button_path = "./assets/pencil.png"
+    self.button_path = "./assets/box.png"
     self.radius = 1
     Tool.__init__(self, index, parent)
 
